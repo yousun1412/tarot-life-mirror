@@ -12,7 +12,7 @@ const read = relative => fs.readFileSync(path.join(root, relative), 'utf8');
 
 const required = [
   'index.html', 'offline.html', 'manifest.webmanifest', 'version.json', 'service-worker.js',
-  'css/main.css', 'css/v14.css', 'css/v15.css', 'css/v16.css', 'css/v17.css', 'data/major-arcana.js', 'data/minor-arcana.js', 'data/interpretation-v17.js',
+  'css/main.css', 'css/v14.css', 'css/v15.css', 'css/v16.css', 'css/v17.css', 'css/v18.css', 'data/major-arcana.js', 'data/minor-arcana.js', 'data/interpretation-v18.js',
   'js/app.js', 'js/pwa.js', 'js/storage.js', 'js/card-viewer.js', 'js/library.js',
   'js/share.js', 'js/history.js', 'icons/icon-192.png', 'icons/icon-512.png',
   'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'
@@ -108,41 +108,42 @@ for (const file of jsFiles) {
 ok('JavaScript语法检查完成');
 
 
-// V17 additional checks
-for (const relativePath of ['css/v17.css','data/interpretation-v17.js']) {
-  if (!exists(relativePath)) fail(`缺少 V17 文件：${relativePath}`);
+// V18 additional checks
+for (const relativePath of ['css/v18.css','data/interpretation-v18.js']) {
+  if (!exists(relativePath)) fail(`缺少 V18 文件：${relativePath}`);
 }
-const v17EngineText = read('data/interpretation-v17.js');
-for (const marker of ['TOPIC_GUIDES','POSITION_BUILDERS','getNarrativeLinks','daily','weekly','17.0.0','buildMultiSummary']) {
-  if (!v17EngineText.includes(marker)) fail(`V17 引擎缺少标记：${marker}`);
+const v18EngineText = read('data/interpretation-v18.js');
+for (const marker of ['TOPIC_GUIDES','POSITION_BUILDERS','getNarrativeLinks','daily','weekly','monthly','18.0.0','buildMultiSummary']) {
+  if (!v18EngineText.includes(marker)) fail(`V18 引擎缺少标记：${marker}`);
 }
 try {
   const context = vm.createContext({ window: {}, console });
   vm.runInContext(read('data/major-arcana.js'), context, { filename: 'major-arcana.js' });
   vm.runInContext(read('data/minor-arcana.js'), context, { filename: 'minor-arcana.js' });
-  vm.runInContext(read('data/interpretation-v17.js'), context, { filename: 'interpretation-v17.js' });
+  vm.runInContext(read('data/interpretation-v18.js'), context, { filename: 'interpretation-v18.js' });
   const enriched = context.window.LIFE_MIRROR_DATA.cards;
   let topicCount = 0;
   for (const card of enriched) {
-    for (const topic of ['relationship','work','growth','emotion','decision','daily','weekly']) {
+    for (const topic of ['relationship','work','growth','emotion','decision','daily','weekly','monthly']) {
       for (const orientation of ['upright','reversed']) {
-        const text = context.window.LifeMirrorV17.topicText(card, topic, orientation);
-        if (!text || text.length < 30) fail(`V17主题解释异常：${card.name}/${topic}/${orientation}`);
+        const text = context.window.LifeMirrorV18.topicText(card, topic, orientation);
+        if (!text || text.length < 30) fail(`V18主题解释异常：${card.name}/${topic}/${orientation}`);
         topicCount += 1;
       }
     }
   }
-  if (topicCount !== 1092) fail(`V17主题解释应为1092条，实际为${topicCount}`);
-  else ok('V17 1092条正逆位主题解释检查通过');
+  if (topicCount !== 1248) fail(`V18主题解释应为1248条，实际为${topicCount}`);
+  else ok('V18 1248条正逆位主题解释检查通过');
 } catch (error) {
-  fail(`V17引擎执行失败：${error.stack || error.message}`);
+  fail(`V18引擎执行失败：${error.stack || error.message}`);
 }
 
 const appText = read('js/app.js');
-for (const marker of ['beginDailyFortune','beginWeeklyFortune','weekly-three','weekly-seven','如上，如下；如内，如外。']) {
-  if (!appText.includes(marker)) fail(`V17周期运势流程缺少标记：${marker}`);
+for (const marker of ['beginDailyFortune','beginWeeklyFortune','beginMonthlyFortune','monthly-five','monthly-seven','如上，如下；如内，如外。']) {
+  if (!appText.includes(marker)) fail(`V18周期运势流程缺少标记：${marker}`);
 }
-if (!appText.includes("getPositions().length")) fail('V17抽牌数量未改为动态牌阵长度');
+if (!appText.includes("getPositions().length")) fail('V18抽牌数量未改为动态牌阵长度');
+for (const marker of ['data-interpretation-layer="overview"','data-interpretation-layer="full"','data-interpretation-layer="deep"','本月运势']) { if (!html.includes(marker)) fail(`V18页面缺少标记：${marker}`); }
 
 if (errors.length) {
   console.error('\n构建校验失败：');
@@ -150,4 +151,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`\nV17构建校验通过：${cards.length || 78}张牌，${cardImages.length}张本地小阿尔卡那牌图。`);
+console.log(`\nV18构建校验通过：${cards.length || 78}张牌，${cardImages.length}张本地小阿尔卡那牌图。`);

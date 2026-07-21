@@ -14,12 +14,14 @@
       id: record.id || uid(),
       timestamp,
       date: record.date || new Date(timestamp).toLocaleString(),
-      readingType: record.readingType || (record.topicKey === 'daily' ? 'daily' : record.topicKey === 'weekly' ? 'weekly' : 'reflection'),
+      readingType: record.readingType || (record.topicKey === 'daily' ? 'daily' : record.topicKey === 'weekly' ? 'weekly' : record.topicKey === 'monthly' ? 'monthly' : 'reflection'),
       dayKey: record.dayKey || '',
       weekKey: record.weekKey || '',
+      monthKey: record.monthKey || '',
       periodLabel: record.periodLabel || '',
       dailyMode: record.dailyMode || '',
       weeklyMode: record.weeklyMode || '',
+      monthlyMode: record.monthlyMode || '',
       topicKey: record.topicKey || '',
       topic: record.topic || '未分类',
       question: record.question || '未记录问题',
@@ -40,6 +42,10 @@
                 ? ['本周整体主线','本周主要挑战','本周可用力量'][index]
                 : record.spread === 'weekly-seven'
                   ? ['本周整体能量','学习与工作','关系与互动','情绪与内在','现实资源','主要挑战','本周建议'][index]
+                  : record.spread === 'monthly-five'
+                    ? ['本月整体主题','学习与工作','关系与互动','现实生活与资源','本月行动建议'][index]
+                    : record.spread === 'monthly-seven'
+                      ? ['月初状态','月中变化','月末趋势','学习与工作','关系与互动','主要挑战','可使用的力量'][index]
                   : record.spread === 'three'
                     ? ['当前状态','需要看见','可以行动'][index]
                     : record.spread === 'daily-single' ? '今日主题' : '此刻需要看见'
@@ -102,7 +108,7 @@
   }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify({ version: 17, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ version: 18, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;

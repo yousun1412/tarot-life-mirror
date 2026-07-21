@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "生命之镜塔罗 V17",
+  "name": "生命之镜塔罗 V18",
   "short_name": "生命之镜",
-  "description": "可安装、可离线的完整78张塔罗应用，支持普通抽牌、本日运势与本周运势。",
+  "description": "可安装、可离线的完整78张塔罗应用，支持问事抽牌、本日、本周与本月运势。",
   "lang": "zh-CN",
   "start_url": "./index.html",
   "scope": "./",
@@ -41,8 +41,8 @@
   ],
   "shortcuts": [
     {
-      "name": "开始一次抽牌",
-      "short_name": "开始抽牌",
+      "name": "问一件事",
+      "short_name": "问事抽牌",
       "url": "./index.html?action=start",
       "icons": [
         {
@@ -66,6 +66,17 @@
       "name": "查看本周运势",
       "short_name": "本周运势",
       "url": "./index.html?action=weekly",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "查看本月运势",
+      "short_name": "本月运势",
+      "url": "./index.html?action=monthly",
       "icons": [
         {
           "src": "./icons/icon-192.png",
