@@ -1,0 +1,7 @@
+
+/* V15：解读引擎 2.0 */
+.interpretation-engine-badge{display:inline-flex;align-items:center;gap:6px;margin:4px 0 10px;padding:5px 9px;border-radius:999px;border:1px solid rgba(233,197,124,.3);background:rgba(233,197,124,.08);color:#ecd49d;font-size:11px;letter-spacing:.04em}
+.narrative-analysis{margin-top:14px;padding:12px 14px;border-radius:15px;background:linear-gradient(135deg,rgba(86,61,104,.18),rgba(37,63,55,.18));border:1px solid rgba(233,197,124,.17)}
+.narrative-analysis h3{margin-top:0}.narrative-analysis ul{margin-bottom:0;padding-left:19px}.narrative-analysis li{margin:7px 0}
+.topic-meaning-v15{padding:12px 13px;border-radius:14px;background:rgba(91,74,115,.14);border:1px solid rgba(173,144,202,.2)}
+.topic-meaning-v15 h3{margin-top:0}.answer-block{position:relative}.answer-block:before{content:'V15';position:absolute;right:9px;top:8px;font-size:9px;letter-spacing:.12em;color:rgba(233,197,124,.55)}

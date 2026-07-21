@@ -543,6 +543,9 @@ function getOrientationData(selection) {
 }
 
 function buildCardAnswer(selection, position) {
+  if (window.LifeMirrorV15) {
+    return window.LifeMirrorV15.cardAnswer(selection, position, state.topic, state.question, isBinaryQuestion());
+  }
   const { card, orientation } = selection;
   const data = getOrientationData(selection);
   const topicText = card.topics[state.topic] || card.theme;
@@ -570,6 +573,9 @@ function buildCardAnswer(selection, position) {
 }
 
 function positionSpecificText(selection, position) {
+  if (window.LifeMirrorV15) {
+    return window.LifeMirrorV15.positionText(selection.card, state.topic, selection.orientation, position.role);
+  }
   const { card, orientation } = selection;
   const data = getOrientationData(selection);
 
@@ -693,6 +699,7 @@ function analyzePatterns() {
   insights.push(...getDeckStructureInsights());
   if (energy) insights.push(energy);
   insights.push(...getPairInsights());
+  if (window.LifeMirrorV15) insights.push(...window.LifeMirrorV15.extraPatterns(state.selected));
 
   if (state.observation) {
     const selection = state.selected[state.observation.cardIndex];
@@ -701,12 +708,13 @@ function analyzePatterns() {
     );
   }
 
-  return insights.slice(0, 5);
+  return insights.slice(0, 8);
 }
 
 function buildSingleSummary() {
   const selection = state.selected[0];
   const position = POSITION_RULES.single;
+  if (window.LifeMirrorV15) return window.LifeMirrorV15.buildSingleSummary({ selection, position, topic: state.topic, question: state.question, binary: isBinaryQuestion() });
   return [
     `关于“${state.question}”，${selection.card.name}${orientationLabel(selection)}没有给出一个固定预言，而是把注意力放在“${selection.card.theme}”上。`,
     buildCardAnswer(selection, position),
@@ -718,6 +726,7 @@ function buildThreeCardSummary() {
   const positions = getPositions();
   const [current, awareness, action] = state.selected;
   const topic = TOPICS[state.topic];
+  if (window.LifeMirrorV15) return window.LifeMirrorV15.buildThreeSummary({ selected: state.selected, positions, topic: state.topic, question: state.question, binary: isBinaryQuestion(), topicNote: topic.note });
 
   const intro = isBinaryQuestion()
     ? `关于“${state.question}”，这组三张牌不适合被压缩成简单的“会”或“不会”。它更像一条从现状、盲点到行动条件的路径。`
@@ -788,6 +797,11 @@ function cardReadingHTML(selection, index, position) {
         <p>${safe(buildCardAnswer(selection, position))}</p>
       </section>
 
+      <section class="topic-meaning-v15">
+        <h3>结合“${safe(TOPICS[state.topic].label)}”的${orientationText}解读</h3>
+        <p>${safe(window.LifeMirrorV15?.topicText(card, state.topic, orientation) || card.topics[state.topic] || card.theme)}</p>
+      </section>
+
       <section class="orientation-meaning ${orientation}">
         <h3>${orientationText}核心牌意</h3>
         <p>${safe(data.core)}</p>
@@ -834,14 +848,19 @@ function showFullInterpretation(focusIndex = 0) {
   const positions = getPositions();
   const insights = analyzePatterns();
 
-  $('interpretSpreadLabel').textContent = state.spread === 'single' ? '单牌规则解读' : '三牌规则解读';
+  $('interpretSpreadLabel').innerHTML = `<span class="interpretation-engine-badge">✦ V15 解读引擎 2.0</span><br>${state.spread === 'single' ? '单牌规则解读' : '三牌规则解读'}`;
   $('interpretTitle').textContent = state.spread === 'single' ? '本次牌意解读' : '完整牌阵解读';
-  $('interpretTheme').textContent = `问题类型：${TOPICS[state.topic].label}。内容由本地规则、牌义资料和组合条件生成，没有调用大模型。`;
+  $('interpretTheme').textContent = `问题类型：${TOPICS[state.topic].label}。内容由78张牌义、正逆位主题、牌阵位置和组合关系共同生成，没有调用大模型。`;
   $('spreadAnswer').textContent = buildOverallSummary();
 
   $('patternList').innerHTML = insights
     .map(item => `<li>${safe(item)}</li>`)
     .join('');
+
+  const narrativeLinks = window.LifeMirrorV15?.narrativeLinks(state.selected, positions, state.topic) || [];
+  const narrativeSection = $('narrativeSection');
+  if (narrativeSection) narrativeSection.hidden = !narrativeLinks.length;
+  if ($('narrativeList')) $('narrativeList').innerHTML = narrativeLinks.map(item => `<li>${safe(item)}</li>`).join('');
 
   $('interpretationList').innerHTML = state.selected
     .map((selection, index) => cardReadingHTML(selection, index, positions[index]))
@@ -1015,7 +1034,7 @@ function start() {
   clearDeck();
 
   setDialogue(
-    '欢迎来到这张安静的桌子。\nV14 不使用大模型，采用完整78张 Rider–Waite–Smith 塔罗牌面。洗牌后可以自己选择1–78的数字，也可以选择“交给命运”随机抽取。',
+    '欢迎来到这张安静的桌子。\nV15 不使用大模型，采用完整78张 Rider–Waite–Smith 塔罗牌面，并升级了正逆位主题、位置作用与多牌连接解读。洗牌后可以自己选择1–78的数字，也可以选择“交给命运”随机抽取。',
     [
       { label: '开始', onClick: chooseTopic },
       { label: '先做一次呼吸', onClick: breathe }

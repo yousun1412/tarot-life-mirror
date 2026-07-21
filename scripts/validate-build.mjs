@@ -12,7 +12,7 @@ const read = relative => fs.readFileSync(path.join(root, relative), 'utf8');
 
 const required = [
   'index.html', 'offline.html', 'manifest.webmanifest', 'version.json', 'service-worker.js',
-  'css/main.css', 'css/v14.css', 'data/major-arcana.js', 'data/minor-arcana.js',
+  'css/main.css', 'css/v14.css', 'css/v15.css', 'data/major-arcana.js', 'data/minor-arcana.js', 'data/interpretation-v15.js',
   'js/app.js', 'js/pwa.js', 'js/storage.js', 'js/card-viewer.js', 'js/library.js',
   'js/share.js', 'js/history.js', 'icons/icon-192.png', 'icons/icon-512.png',
   'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'
@@ -80,7 +80,7 @@ for (const ref of shellRefs) {
   if (ref === './') continue;
   if (!exists(ref)) fail(`Service Worker核心文件不存在：${ref}`);
 }
-if (shellRefs.some(ref => ref.includes('assets/cards'))) fail('V14不应在安装阶段预缓存全部牌图');
+if (shellRefs.some(ref => ref.includes('assets/cards'))) fail('V15不应在安装阶段预缓存全部牌图');
 ok('Service Worker核心缓存清单检查完成');
 
 try {
@@ -107,10 +107,41 @@ for (const file of jsFiles) {
 }
 ok('JavaScript语法检查完成');
 
+
+// V15 additional checks
+for (const relativePath of ['css/v15.css','data/interpretation-v15.js']) {
+  if (!exists(relativePath)) fail(`缺少 V15 文件：${relativePath}`);
+}
+const v15EngineText = read('data/interpretation-v15.js');
+for (const marker of ['TOPIC_GUIDES','POSITION_BUILDERS','getNarrativeLinks','getExtraPatterns','15.0.0']) {
+  if (!v15EngineText.includes(marker)) fail(`V15 引擎缺少标记：${marker}`);
+}
+try {
+  const context = vm.createContext({ window: {}, console });
+  vm.runInContext(read('data/major-arcana.js'), context, { filename: 'major-arcana.js' });
+  vm.runInContext(read('data/minor-arcana.js'), context, { filename: 'minor-arcana.js' });
+  vm.runInContext(read('data/interpretation-v15.js'), context, { filename: 'interpretation-v15.js' });
+  const enriched = context.window.LIFE_MIRROR_DATA.cards;
+  let topicCount = 0;
+  for (const card of enriched) {
+    for (const topic of ['relationship','work','growth','emotion','decision']) {
+      for (const orientation of ['upright','reversed']) {
+        const text = context.window.LifeMirrorV15.topicText(card, topic, orientation);
+        if (!text || text.length < 30) fail(`V15主题解释异常：${card.name}/${topic}/${orientation}`);
+        topicCount += 1;
+      }
+    }
+  }
+  if (topicCount !== 780) fail(`V15主题解释应为780条，实际为${topicCount}`);
+  else ok('V15 780条正逆位主题解释检查通过');
+} catch (error) {
+  fail(`V15引擎执行失败：${error.stack || error.message}`);
+}
+
 if (errors.length) {
   console.error('\n构建校验失败：');
   errors.forEach(error => console.error(`✗ ${error}`));
   process.exit(1);
 }
 
-console.log(`\nV14构建校验通过：${cards.length || 78}张牌，${cardImages.length}张本地小阿尔卡那牌图。`);
+console.log(`\nV15构建校验通过：${cards.length || 78}张牌，${cardImages.length}张本地小阿尔卡那牌图。`);
