@@ -19,29 +19,49 @@
   async function generate() {
     if (!target) return;
     status.textContent = '正在生成分享卡……';
-    canvas.width=W;canvas.height=H;
-    const grad=ctx.createLinearGradient(0,0,0,H);grad.addColorStop(0,'#211725');grad.addColorStop(.55,'#18352f');grad.addColorStop(1,'#100b14');ctx.fillStyle=grad;ctx.fillRect(0,0,W,H);
-    ctx.strokeStyle='rgba(233,197,124,.45)';ctx.lineWidth=3;ctx.strokeRect(34,34,W-68,H-68);
+    const isWeeklySeven = target.readingType === 'weekly' && (target.cards || []).length === 7;
+    const canvasHeight = isWeeklySeven ? 1780 : H;
+    canvas.width=W;canvas.height=canvasHeight;
+    const grad=ctx.createLinearGradient(0,0,0,canvasHeight);grad.addColorStop(0,'#211725');grad.addColorStop(.55,'#18352f');grad.addColorStop(1,'#100b14');ctx.fillStyle=grad;ctx.fillRect(0,0,W,canvasHeight);
+    ctx.strokeStyle='rgba(233,197,124,.45)';ctx.lineWidth=3;ctx.strokeRect(34,34,W-68,canvasHeight-68);
     ctx.fillStyle='#e9c57c';ctx.font='600 28px sans-serif';ctx.fillText('✦ 生命之镜塔罗',72,92);
     const shareTitle = target.readingType === 'daily'
       ? (target.spread === 'daily-three' ? '本日运势 · 三张牌' : '本日运势 · 今日主题')
-      : (target.spread === 'three' ? '三张反思牌阵' : '此刻需要看见');
+      : target.readingType === 'weekly'
+        ? (target.spread === 'weekly-seven' ? '本周运势 · 完整地图' : '本周运势 · 三张牌')
+        : (target.spread === 'three' ? '三张反思牌阵' : '此刻需要看见');
     ctx.fillStyle='#f7edd8';ctx.font='700 51px serif';ctx.fillText(shareTitle,72,162);
-    ctx.fillStyle='rgba(247,237,216,.65)';ctx.font='24px sans-serif';ctx.fillText(`${target.topic || '自我反思'} · ${target.drawMode==='fate'?'交给命运':'自选数字'} · ${target.date || new Date().toLocaleDateString()}`,72,205);
+    ctx.fillStyle='rgba(247,237,216,.65)';ctx.font='24px sans-serif';ctx.fillText(`${target.periodLabel || target.topic || '自我反思'} · ${target.drawMode==='fate'?'交给命运':'自选数字'} · ${target.date || new Date().toLocaleDateString()}`,72,205);
     let y=260;
     if(includeQuestion.checked && target.question){ctx.fillStyle='rgba(255,255,255,.07)';roundedRect(62,y,W-124,128,24);ctx.fillStyle='#f4e9d5';ctx.font='28px sans-serif';y=wrap(`“${target.question}”`,88,y+46,W-176,39,2)+30;} else y+=20;
-    const cards=target.cards||[], gap=28, cardW=cards.length===1?330:250, cardH=cardW*1.675, total=cards.length*cardW+(cards.length-1)*gap, start=(W-total)/2;
-    for(let i=0;i<cards.length;i++){
-      const raw=cards[i], card=cardData(raw), x=start+i*(cardW+gap);
-      ctx.fillStyle='rgba(0,0,0,.32)';roundedRect(x-8,y-8,cardW+16,cardH+16,18);
-      try{const img=await loadImage(card.image);fitImage(img,x,y,cardW,cardH,raw.orientation==='reversed');}catch(e){ctx.fillStyle='#2b2038';roundedRect(x,y,cardW,cardH,14);ctx.fillStyle='#fff';ctx.font='34px sans-serif';ctx.textAlign='center';ctx.fillText(card.name,x+cardW/2,y+cardH/2);ctx.textAlign='left';}
-      ctx.fillStyle='#f7edd8';ctx.font='700 24px sans-serif';ctx.textAlign='center';ctx.fillText(`${raw.position ? raw.position+'｜' : ''}${card.name}${raw.orientation==='reversed'?'（逆）':''}${raw.deckNumber ? ' · #'+raw.deckNumber : ''}`,x+cardW/2,y+cardH+42);ctx.textAlign='left';
-    }
-    y += cardH+92;ctx.fillStyle='#e9c57c';ctx.font='700 26px sans-serif';ctx.fillText('本次提示',72,y);y+=46;ctx.fillStyle='#e9deca';ctx.font='26px sans-serif';wrap(target.summary||'把牌面当作一面镜子，核对现实，再决定下一步。',72,y,W-144,39,5);
-    ctx.fillStyle='rgba(247,237,216,.48)';ctx.font='20px sans-serif';ctx.fillText('用于塔罗文化学习、娱乐与自我反思，不构成确定性预测。',72,H-82);
+    const cards=target.cards||[];
+    if (cards.length === 7) {
+      const cardW=185, cardH=cardW*1.675, gapX=34, gapY=88;
+      const rows=[[0,1,2,3],[4,5,6]];
+      for(let row=0;row<rows.length;row++){
+        const indexes=rows[row], total=indexes.length*cardW+(indexes.length-1)*gapX, startX=(W-total)/2;
+        for(let col=0;col<indexes.length;col++){
+          const i=indexes[col], raw=cards[i], card=cardData(raw), x=startX+col*(cardW+gapX), cardY=y+row*(cardH+gapY);
+          ctx.fillStyle='rgba(0,0,0,.32)';roundedRect(x-6,cardY-6,cardW+12,cardH+12,16);
+          try{const img=await loadImage(card.image);fitImage(img,x,cardY,cardW,cardH,raw.orientation==='reversed');}catch(e){ctx.fillStyle='#2b2038';roundedRect(x,cardY,cardW,cardH,14);ctx.fillStyle='#fff';ctx.font='26px sans-serif';ctx.textAlign='center';ctx.fillText(card.name,x+cardW/2,cardY+cardH/2);ctx.textAlign='left';}
+          ctx.fillStyle='#f7edd8';ctx.font='700 18px sans-serif';ctx.textAlign='center';ctx.fillText(`${raw.position||''}｜${card.name}${raw.orientation==='reversed'?'（逆）':''}`,x+cardW/2,cardY+cardH+30);ctx.textAlign='left';
+        }
+      }
+      y += 2*cardH+gapY+72;
+    } else {
+      const gap=28, cardW=cards.length===1?330:250, cardH=cardW*1.675, total=cards.length*cardW+(cards.length-1)*gap, start=(W-total)/2;
+      for(let i=0;i<cards.length;i++){
+        const raw=cards[i], card=cardData(raw), x=start+i*(cardW+gap);
+        ctx.fillStyle='rgba(0,0,0,.32)';roundedRect(x-8,y-8,cardW+16,cardH+16,18);
+        try{const img=await loadImage(card.image);fitImage(img,x,y,cardW,cardH,raw.orientation==='reversed');}catch(e){ctx.fillStyle='#2b2038';roundedRect(x,y,cardW,cardH,14);ctx.fillStyle='#fff';ctx.font='34px sans-serif';ctx.textAlign='center';ctx.fillText(card.name,x+cardW/2,y+cardH/2);ctx.textAlign='left';}
+        ctx.fillStyle='#f7edd8';ctx.font='700 24px sans-serif';ctx.textAlign='center';ctx.fillText(`${raw.position ? raw.position+'｜' : ''}${card.name}${raw.orientation==='reversed'?'（逆）':''}${raw.deckNumber ? ' · #'+raw.deckNumber : ''}`,x+cardW/2,y+cardH+42);ctx.textAlign='left';
+      }
+      y += cardH+92;
+    };ctx.fillStyle='#e9c57c';ctx.font='700 26px sans-serif';ctx.fillText('本次提示',72,y);y+=46;ctx.fillStyle='#e9deca';ctx.font='26px sans-serif';wrap(target.summary||'把牌面当作一面镜子，核对现实，再决定下一步。',72,y,W-144,39,5);
+    ctx.fillStyle='rgba(247,237,216,.48)';ctx.font='20px sans-serif';ctx.fillText('用于塔罗文化学习、娱乐与自我反思，不构成确定性预测。',72,canvasHeight-82);
     status.textContent='分享卡已生成。默认不显示完整问题，可在右侧切换。';
   }
-  async function download(){await generate();const a=document.createElement('a');a.download=`生命之镜塔罗-${target?.readingType==='daily'?'本日运势-':''}${Date.now()}.png`;a.href=canvas.toDataURL('image/png');a.click();}
+  async function download(){await generate();const a=document.createElement('a');a.download=`生命之镜塔罗-${target?.readingType==='daily'?'本日运势-':target?.readingType==='weekly'?'本周运势-':''}${Date.now()}.png`;a.href=canvas.toDataURL('image/png');a.click();}
   async function nativeShare(){await generate();if(!navigator.share){status.textContent='当前浏览器不支持原生分享，请使用“保存图片”。';return;}const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));const file=new File([blob],'生命之镜塔罗.png',{type:'image/png'});try{await navigator.share({title:'生命之镜塔罗',text:'我的塔罗反思记录',files:[file]});}catch(e){if(e.name!=='AbortError')status.textContent='分享未完成，请改用保存图片。';}}
   function open(snapshot){target=snapshot;includeQuestion.checked=false;dialog.showModal();generate();}
   function init(){dialog=document.getElementById('shareDialog');canvas=document.getElementById('shareCanvas');if(!dialog)return;ctx=canvas.getContext('2d');includeQuestion=document.getElementById('shareIncludeQuestion');status=document.getElementById('shareStatus');document.getElementById('closeShare').onclick=()=>dialog.close();document.getElementById('shareDownload').onclick=download;document.getElementById('shareNative').onclick=nativeShare;includeQuestion.onchange=generate;dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close();});}

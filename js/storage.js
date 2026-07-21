@@ -14,9 +14,12 @@
       id: record.id || uid(),
       timestamp,
       date: record.date || new Date(timestamp).toLocaleString(),
-      readingType: record.readingType || (record.topicKey === 'daily' ? 'daily' : 'reflection'),
+      readingType: record.readingType || (record.topicKey === 'daily' ? 'daily' : record.topicKey === 'weekly' ? 'weekly' : 'reflection'),
       dayKey: record.dayKey || '',
+      weekKey: record.weekKey || '',
+      periodLabel: record.periodLabel || '',
       dailyMode: record.dailyMode || '',
+      weeklyMode: record.weeklyMode || '',
       topicKey: record.topicKey || '',
       topic: record.topic || '未分类',
       question: record.question || '未记录问题',
@@ -33,9 +36,13 @@
           position: item.position || (
             record.spread === 'daily-three'
               ? ['今日主线','今日需要留意','今日行动建议'][index]
-              : record.spread === 'three'
-                ? ['当前状态','需要看见','可以行动'][index]
-                : record.spread === 'daily-single' ? '今日主题' : '此刻需要看见'
+              : record.spread === 'weekly-three'
+                ? ['本周整体主线','本周主要挑战','本周可用力量'][index]
+                : record.spread === 'weekly-seven'
+                  ? ['本周整体能量','学习与工作','关系与互动','情绪与内在','现实资源','主要挑战','本周建议'][index]
+                  : record.spread === 'three'
+                    ? ['当前状态','需要看见','可以行动'][index]
+                    : record.spread === 'daily-single' ? '今日主题' : '此刻需要看见'
           ),
           deckNumber: Number.isInteger(Number(item.deckNumber)) ? Number(item.deckNumber) : null,
           drawMode: item.drawMode === 'fate' ? 'fate' : (record.drawMode === 'fate' ? 'fate' : 'manual')
@@ -95,7 +102,7 @@
   }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify({ version: 16, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ version: 17, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;

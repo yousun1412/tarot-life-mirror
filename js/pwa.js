@@ -1,5 +1,5 @@
 (() => {
-  const APP_VERSION = '16.0.0';
+  const APP_VERSION = '17.0.0';
   const installBtn = document.getElementById('installBtn');
   const installGuide = document.getElementById('installGuide');
   const installGuideContent = document.getElementById('installGuideContent');

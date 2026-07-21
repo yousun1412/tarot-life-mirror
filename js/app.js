@@ -24,6 +24,10 @@ const TOPICS = {
   daily: {
     label: '本日运势',
     note: '把牌面作为今天的观察提示：留意正在发生的条件，并把建议落实为一个小行动。'
+  },
+  weekly: {
+    label: '本周运势',
+    note: '把牌面作为本周的观察地图：辨认主线、挑战与可使用的资源，再安排现实行动。'
   }
 };
 
@@ -67,6 +71,56 @@ const POSITION_RULES = {
     label: '今日行动建议',
     role: '行动',
     prompt: '这张牌帮助你把今天的提示转化为一个具体行动。'
+  },
+  weeklyFlow: {
+    label: '本周整体主线',
+    role: '趋势',
+    prompt: '这张牌呈现本周较可能贯穿始终的主要能量与发展方向。'
+  },
+  weeklyChallenge: {
+    label: '本周主要挑战',
+    role: '阻力',
+    prompt: '这张牌指出本周最需要正视、调整或避免放大的困难。'
+  },
+  weeklyResource: {
+    label: '本周可用力量',
+    role: '资源',
+    prompt: '这张牌指出本周已经存在、可以主动调用的资源与能力。'
+  },
+  weeklyOverall: {
+    label: '本周整体能量',
+    role: '趋势',
+    prompt: '这张牌概括本周的核心氛围和可能持续出现的主题。'
+  },
+  weeklyWork: {
+    label: '学习与工作',
+    role: '现状',
+    prompt: '这张牌描述本周在学习、工作、目标与责任方面的主要状态。'
+  },
+  weeklyRelationship: {
+    label: '关系与互动',
+    role: '现状',
+    prompt: '这张牌用于观察本周关系中的互动、沟通与边界，不推断他人未表达的内心。'
+  },
+  weeklyEmotion: {
+    label: '情绪与内在',
+    role: '核心视角',
+    prompt: '这张牌呈现本周内在感受、身体反应与心理节奏的核心主题。'
+  },
+  weeklyReality: {
+    label: '现实资源',
+    role: '资源',
+    prompt: '这张牌指出本周可用的时间、金钱、身体条件或现实支持。'
+  },
+  weeklyFullChallenge: {
+    label: '主要挑战',
+    role: '阻力',
+    prompt: '这张牌指出本周最需要管理的阻力、风险或失衡模式。'
+  },
+  weeklyAdvice: {
+    label: '本周建议',
+    role: '行动',
+    prompt: '这张牌帮助你把本周的整体提示转化为具体、可执行的安排。'
   }
 };
 
@@ -86,6 +140,8 @@ const state = {
   drawMode: '',
   readingType: 'reflection',
   dayKey: '',
+  weekKey: '',
+  periodLabel: '',
   recordId: ''
 };
 
@@ -178,16 +234,38 @@ function localDayKey(date = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
+
+function getLocalWeekInfo(date = new Date()) {
+  const current = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 12);
+  const weekday = current.getDay() || 7;
+  const monday = new Date(current);
+  monday.setDate(current.getDate() - weekday + 1);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+  const key = localDayKey(monday);
+  const format = value => `${value.getMonth() + 1}月${value.getDate()}日`;
+  return { key, monday, sunday, label: `${format(monday)}—${format(sunday)}` };
+}
+
 function isSingleSpread() {
   return state.spread === 'single' || state.spread === 'daily-single';
 }
 
 function requiredCardCount() {
-  return isSingleSpread() ? 1 : 3;
+  return getPositions().length;
 }
 
 function isDailyReading() {
   return state.readingType === 'daily';
+}
+
+
+function isWeeklyReading() {
+  return state.readingType === 'weekly';
+}
+
+function isPeriodicReading() {
+  return isDailyReading() || isWeeklyReading();
 }
 
 function getTodayReading() {
@@ -195,28 +273,45 @@ function getTodayReading() {
   return window.LifeMirrorStorage?.load().find(record => record.readingType === 'daily' && record.dayKey === key) || null;
 }
 
+function getThisWeekReading() {
+  const { key } = getLocalWeekInfo();
+  return window.LifeMirrorStorage?.load().find(record => record.readingType === 'weekly' && record.weekKey === key) || null;
+}
+
 function getPositions() {
   if (state.spread === 'daily-single') return [POSITION_RULES.dailySingle];
   if (state.spread === 'daily-three') return [POSITION_RULES.dailyFlow, POSITION_RULES.dailyWatch, POSITION_RULES.dailyAction];
+  if (state.spread === 'weekly-three') return [POSITION_RULES.weeklyFlow, POSITION_RULES.weeklyChallenge, POSITION_RULES.weeklyResource];
+  if (state.spread === 'weekly-seven') return [
+    POSITION_RULES.weeklyOverall,
+    POSITION_RULES.weeklyWork,
+    POSITION_RULES.weeklyRelationship,
+    POSITION_RULES.weeklyEmotion,
+    POSITION_RULES.weeklyReality,
+    POSITION_RULES.weeklyFullChallenge,
+    POSITION_RULES.weeklyAdvice
+  ];
   return state.spread === 'single'
     ? [POSITION_RULES.single]
     : [POSITION_RULES.current, POSITION_RULES.awareness, POSITION_RULES.action];
 }
 
 function getSlotLabels() {
-  if (state.spread === 'daily-single') return ['', '今日主题', ''];
-  if (state.spread === 'daily-three') return ['今日主线', '今日需要留意', '今日行动建议'];
-  return ['当前状态', state.spread === 'single' ? '此刻需要看见' : '需要看见', '可以行动'];
+  return getPositions().map(position => position.label);
 }
 
 function renderSlots() {
-  const single = isSingleSpread();
-  document.querySelector('.spread')?.classList.toggle('single-mode', single);
-  const labels = getSlotLabels();
-  document.querySelectorAll('.slot').forEach((slot, index) => {
-    slot.innerHTML = `<span class="empty-label">${labels[index]}</span><span class="slot-label">${labels[index]}</span>`;
-    slot.classList.toggle('hidden', single && index !== 1);
-  });
+  const positions = getPositions();
+  const single = positions.length === 1;
+  const spread = $('spread');
+  spread.classList.toggle('single-mode', single);
+  spread.classList.toggle('three-mode', positions.length === 3);
+  spread.classList.toggle('seven-mode', positions.length === 7);
+  spread.innerHTML = positions.map((position, index) => `
+    <div class="slot" data-slot="${index}">
+      <span class="empty-label">${safe(position.label)}</span>
+      <span class="slot-label">${safe(position.label)}</span>
+    </div>`).join('');
 }
 
 function clearDeck() {
@@ -319,7 +414,8 @@ function finishShuffle() {
 function chooseDrawMethod() {
   const required = requiredCardCount();
   setDialogue(
-    `牌已经洗好，并保持叠成一摞。\n这次由你选择数字，还是交给命运随机抽取${required === 1 ? '一张牌' : '三张不重复的牌'}？`,
+    `牌已经洗好，并保持叠成一摞。
+这次由你选择数字，还是交给命运随机抽取${required}张不重复的牌？`,
     [
       {
         label: '自己选择数字',
@@ -346,11 +442,10 @@ function chooseDrawMethod() {
 }
 
 function beginFateDraw() {
-  setDialogue(
-    isSingleSpread()
-      ? '你把这次选择交给了命运。牌堆会随机给出一张牌。'
-      : '你把这次选择交给了命运。牌堆会依次随机给出三张不重复的牌。'
-  );
+  const required = requiredCardCount();
+  setDialogue(required === 1
+    ? '你把这次选择交给了命运。牌堆会随机给出一张牌。'
+    : `你把这次选择交给了命运。牌堆会依次随机给出${required}张不重复的牌。`);
   deck.classList.add('fate-drawing');
   setTimeout(drawNextFateCard, 650);
 }
@@ -375,13 +470,16 @@ function promptCardNumber() {
   const required = requiredCardCount();
   const next = state.chosenNumbers.length + 1;
   const pickedText = state.chosenNumbers.length
-    ? `\n已选择：${state.chosenNumbers.join('、')}`
+    ? `
+已选择：${state.chosenNumbers.join('、')}`
     : '';
 
   setDialogue(
-    isSingleSpread()
-      ? `牌已经洗好，并保持叠成一摞。\n请凭第一感觉选择 1–${total} 中的一个数字。`
-      : `牌已经洗好，并保持叠成一摞。\n请选择第 ${next}/${required} 个数字（1–${total}），三个数字不能重复。${pickedText}`
+    required === 1
+      ? `牌已经洗好，并保持叠成一摞。
+请凭第一感觉选择 1–${total} 中的一个数字。`
+      : `牌已经洗好，并保持叠成一摞。
+请选择第 ${next}/${required} 个数字（1–${total}），数字不能重复。${pickedText}`
   );
 
   inputWrap.hidden = false;
@@ -411,7 +509,7 @@ function promptCardNumber() {
     drawCardByNumber(value);
   };
 
-  primary(isSingleSpread() ? '按这个数字抽牌' : `确认第 ${next} 个数字`, submit);
+  primary(required === 1 ? '按这个数字抽牌' : `确认第 ${next} 个数字`, submit);
   const input = $('cardNumberInput');
   input.addEventListener('keydown', event => {
     if (event.key === 'Enter') {
@@ -468,7 +566,7 @@ function drawCardByNumber(number, options = {}) {
 
   const orientation = randomOrientation();
   const selection = { card, orientation, deckNumber: number, drawMode: state.drawMode || 'manual' };
-  const targetIndex = isSingleSpread() ? 1 : state.selected.length;
+  const targetIndex = state.selected.length;
   const slot = document.querySelector(`[data-slot="${targetIndex}"]`);
   slot.querySelector('.empty-label')?.remove();
   slot.insertBefore(makeCard(selection), slot.firstChild);
@@ -543,7 +641,8 @@ function askObservationCard() {
   }
 
   setDialogue(
-    '三张牌中，哪一张最先让你产生感觉？\n先选择一张，再指出你注意到的画面线索。',
+    `${state.selected.length}张牌中，哪一张最先让你产生感觉？
+先选择一张，再指出你注意到的画面线索。`,
     state.selected.map((selection, index) => ({
       label: `${index + 1}. ${selection.card.name}${orientationLabel(selection)}`,
       onClick: () => askSymbolObservation(index)
@@ -584,7 +683,10 @@ function saveObservation(cardIndex, label, meaning) {
     isDailyReading()
       ? `你先注意到了“${label}”。
 接下来看看这张牌如何成为今天的提醒。`
-      : `你先注意到了“${label}”。
+      : isWeeklyReading()
+        ? `你先注意到了“${label}”。
+接下来看看这些牌如何共同描绘本周的观察地图。`
+        : `你先注意到了“${label}”。
 本地解读引擎会结合问题类型、正逆位、牌阵位置、共同主题和牌与牌之间的关系生成完整解读。`
   );
 
@@ -592,9 +694,9 @@ function saveObservation(cardIndex, label, meaning) {
     card.onclick = () => window.LifeMirrorViewer?.open(state.selected[index].card, state.selected[index].orientation);
   });
 
-  if (isDailyReading()) window.LifeMirrorStorage?.save(getCurrentReadingSnapshot());
-  ghost(isDailyReading() ? '记录今日感受' : '进入反思', beginReflection);
-  primary(isDailyReading() ? '查看本日运势解读' : '查看完整牌阵解读', () => showFullInterpretation(cardIndex));
+  if (isPeriodicReading()) window.LifeMirrorStorage?.save(getCurrentReadingSnapshot());
+  ghost(isDailyReading() ? '记录今日感受' : isWeeklyReading() ? '记录本周感受' : '进入反思', beginReflection);
+  primary(isDailyReading() ? '查看本日运势解读' : isWeeklyReading() ? '查看本周运势解读' : '查看完整牌阵解读', () => showFullInterpretation(cardIndex));
 }
 
 function isBinaryQuestion() {
@@ -608,8 +710,8 @@ function getOrientationData(selection) {
 }
 
 function buildCardAnswer(selection, position) {
-  if (window.LifeMirrorV16) {
-    return window.LifeMirrorV16.cardAnswer(selection, position, state.topic, state.question, isBinaryQuestion());
+  if (window.LifeMirrorV17) {
+    return window.LifeMirrorV17.cardAnswer(selection, position, state.topic, state.question, isBinaryQuestion());
   }
   const { card, orientation } = selection;
   const data = getOrientationData(selection);
@@ -638,8 +740,8 @@ function buildCardAnswer(selection, position) {
 }
 
 function positionSpecificText(selection, position) {
-  if (window.LifeMirrorV16) {
-    return window.LifeMirrorV16.positionText(selection.card, state.topic, selection.orientation, position.role);
+  if (window.LifeMirrorV17) {
+    return window.LifeMirrorV17.positionText(selection.card, state.topic, selection.orientation, position.role);
   }
   const { card, orientation } = selection;
   const data = getOrientationData(selection);
@@ -693,19 +795,26 @@ function getOrientationPatternInsight() {
       : '单牌为逆位：重点不是坏结果，而是辨认能量受阻、过度、内化或不足的具体表现。';
   }
 
-  const pattern = state.selected.map(item => item.orientation === 'upright' ? 'U' : 'R').join('');
-  const map = {
-    UUU: '三张均为正位：牌阵路径较连贯，重点在落实，而不是继续等待更多答案。',
-    RRR: '三张均为逆位：阻力更多来自尚未整理的内在矛盾、信息或旧模式，暂不宜强行推进。',
-    RUU: '从逆位走向两张正位：起点存在阻塞，但看见盲点后，局面有机会进入可执行状态。',
-    URU: '中间牌逆位：当前状态与行动方向并非完全不清楚，真正的难点在于尚未看见或承认的部分。',
-    UUR: '行动牌逆位：理解可能已经形成，但落地方式仍需调整，避免用力过度或复制旧做法。',
-    RRU: '前两张逆位、最后正位：先处理现状和认知中的阻力，行动方向本身相对明确。',
-    URR: '现状牌正位、后两张逆位：眼前状况较可见，但解释方式和行动方案仍容易失衡。',
-    RUR: '中间牌正位：你可能已经看见关键角度，但起点和执行仍需要修正。'
-  };
+  if (state.selected.length === 3) {
+    const pattern = state.selected.map(item => item.orientation === 'upright' ? 'U' : 'R').join('');
+    const map = {
+      UUU: '三张均为正位：牌阵路径较连贯，重点在落实，而不是继续等待更多答案。',
+      RRR: '三张均为逆位：阻力更多来自尚未整理的内在矛盾、信息或旧模式，暂不宜强行推进。',
+      RUU: '从逆位走向两张正位：起点存在阻塞，但看见盲点后，局面有机会进入可执行状态。',
+      URU: '中间牌逆位：当前状态与行动方向并非完全不清楚，真正的难点在于尚未看见或承认的部分。',
+      UUR: '行动牌逆位：理解可能已经形成，但落地方式仍需调整，避免用力过度或复制旧做法。',
+      RRU: '前两张逆位、最后正位：先处理现状和认知中的阻力，行动方向本身相对明确。',
+      URR: '现状牌正位、后两张逆位：眼前状况较可见，但解释方式和行动方案仍容易失衡。',
+      RUR: '中间牌正位：你可能已经看见关键角度，但起点和执行仍需要修正。'
+    };
+    return map[pattern];
+  }
 
-  return map[pattern];
+  const reversed = state.selected.filter(item => item.orientation === 'reversed').length;
+  if (reversed === 0) return `${state.selected.length}张牌均为正位：本周主题较容易显现，重点在安排优先级并落实行动。`;
+  if (reversed === state.selected.length) return `${state.selected.length}张牌均为逆位：本周更适合整理阻力、修正节奏和补足条件，不宜把所有问题都推向外部。`;
+  if (reversed > state.selected.length / 2) return `${reversed}张逆位占多数：本周的主要工作是调整内部失衡、信息缺口和执行节奏。`;
+  return `正逆位分布较均衡：本周既有可直接使用的力量，也有需要逐项修正的部分。`;
 }
 
 function getDeckStructureInsights() {
@@ -730,7 +839,7 @@ function getDeckStructureInsights() {
   if (majorCount >= 2) {
     insights.push(`牌阵中有 ${majorCount} 张大阿尔卡那：这件事可能不只是短期事件，也与较深的价值、身份或长期模式有关。`);
   } else if (majorCount === 0) {
-    insights.push('三张均为小阿尔卡那：重点更靠近日常行为、沟通、情绪和现实资源，适合从具体调整开始。');
+    insights.push(`${state.selected.length}张均为小阿尔卡那：重点更靠近日常行为、沟通、情绪和现实资源，适合从具体调整开始。`);
   }
 
   const suitCounts = new Map();
@@ -764,7 +873,7 @@ function analyzePatterns() {
   insights.push(...getDeckStructureInsights());
   if (energy) insights.push(energy);
   insights.push(...getPairInsights());
-  if (window.LifeMirrorV16) insights.push(...window.LifeMirrorV16.extraPatterns(state.selected));
+  if (window.LifeMirrorV17) insights.push(...window.LifeMirrorV17.extraPatterns(state.selected));
 
   if (state.observation) {
     const selection = state.selected[state.observation.cardIndex];
@@ -779,7 +888,7 @@ function analyzePatterns() {
 function buildSingleSummary() {
   const selection = state.selected[0];
   const position = getPositions()[0];
-  if (window.LifeMirrorV16) return window.LifeMirrorV16.buildSingleSummary({ selection, position, topic: state.topic, question: state.question, binary: isBinaryQuestion() });
+  if (window.LifeMirrorV17) return window.LifeMirrorV17.buildSingleSummary({ selection, position, topic: state.topic, question: state.question, binary: isBinaryQuestion() });
   return [
     `关于“${state.question}”，${selection.card.name}${orientationLabel(selection)}没有给出一个固定预言，而是把注意力放在“${selection.card.theme}”上。`,
     buildCardAnswer(selection, position),
@@ -789,29 +898,26 @@ function buildSingleSummary() {
 
 function buildThreeCardSummary() {
   const positions = getPositions();
-  const [current, awareness, action] = state.selected;
   const topic = TOPICS[state.topic];
-  if (window.LifeMirrorV16) return window.LifeMirrorV16.buildThreeSummary({ selected: state.selected, positions, topic: state.topic, question: state.question, binary: isBinaryQuestion(), topicNote: topic.note });
+  if (window.LifeMirrorV17) return window.LifeMirrorV17.buildThreeSummary({ selected: state.selected, positions, topic: state.topic, question: state.question, binary: isBinaryQuestion(), topicNote: topic.note });
 
-  const intro = isBinaryQuestion()
-    ? `关于“${state.question}”，这组三张牌不适合被压缩成简单的“会”或“不会”。它更像一条从现状、盲点到行动条件的路径。`
-    : `关于“${state.question}”，这组三张牌形成了一条“当前状态—需要看见—可以行动”的路径。`;
-
-  const relationshipNote = state.topic === 'relationship'
-    ? '\n\n这套规则不会确认对方未表达的内心事实，只依据牌面帮助你观察互动、边界和可以验证的行为。'
-    : '';
-
-  return [
-    intro,
-    `当前状态｜${current.card.name}${orientationLabel(current)}：${getOrientationData(current).core}`,
-    `需要看见｜${awareness.card.name}${orientationLabel(awareness)}：${getOrientationData(awareness).core}`,
-    `可以行动｜${action.card.name}${orientationLabel(action)}：${getOrientationData(action).advice}`,
-    `综合方向：${topic.note}${relationshipNote}`
-  ].join('\n\n');
+  const intro = `关于“${state.question}”，三张牌形成“${positions.map(position => position.label).join('—')}”的发展路径。`;
+  const lines = state.selected.map((selection, index) => `${positions[index].label}｜${selection.card.name}${orientationLabel(selection)}：${getOrientationData(selection).core}`);
+  return [intro, ...lines, `综合方向：${topic.note}`].join('\n\n');
 }
 
 function buildOverallSummary() {
-  return state.selected.length === 1 ? buildSingleSummary() : buildThreeCardSummary();
+  if (state.selected.length === 1) return buildSingleSummary();
+  if (state.selected.length === 3) return buildThreeCardSummary();
+  const positions = getPositions();
+  if (window.LifeMirrorV17?.buildMultiSummary) {
+    return window.LifeMirrorV17.buildMultiSummary({ selected: state.selected, positions, topic: state.topic, question: state.question, topicNote: TOPICS[state.topic]?.note || '' });
+  }
+  return [
+    `关于“${state.question}”，这组牌形成一张由${state.selected.length}个位置组成的观察地图。`,
+    ...state.selected.map((selection, index) => `${positions[index].label}｜${selection.card.name}${orientationLabel(selection)}：${getOrientationData(selection).core}`),
+    `综合方向：${TOPICS[state.topic]?.note || ''}`
+  ].join('\n\n');
 }
 
 function cardReadingHTML(selection, index, position) {
@@ -864,7 +970,7 @@ function cardReadingHTML(selection, index, position) {
 
       <section class="topic-meaning-v15">
         <h3>结合“${safe(TOPICS[state.topic].label)}”的${orientationText}解读</h3>
-        <p>${safe(window.LifeMirrorV16?.topicText(card, state.topic, orientation) || card.topics[state.topic] || card.theme)}</p>
+        <p>${safe(window.LifeMirrorV17?.topicText(card, state.topic, orientation) || card.topics[state.topic] || card.theme)}</p>
       </section>
 
       <section class="orientation-meaning ${orientation}">
@@ -912,23 +1018,27 @@ function cardReadingHTML(selection, index, position) {
 function showFullInterpretation(focusIndex = 0) {
   const positions = getPositions();
   const insights = analyzePatterns();
-
-  const daily = isDailyReading();
-  $('interpretSpreadLabel').innerHTML = `<span class="interpretation-engine-badge">✦ V16 本日运势</span><br>${isSingleSpread() ? '单牌规则解读' : '三牌规则解读'}`;
-  $('interpretTitle').textContent = daily ? '本日运势解读' : (isSingleSpread() ? '本次牌意解读' : '完整牌阵解读');
-  $('interpretTheme').textContent = daily
+  const periodic = isPeriodicReading();
+  const modeLabel = positions.length === 1 ? '单牌规则解读' : `${positions.length}张牌规则解读`;
+  $('interpretSpreadLabel').innerHTML = `<span class="interpretation-engine-badge">✦ V17 本周运势</span><br>${modeLabel}`;
+  $('interpretTitle').textContent = isDailyReading()
+    ? '本日运势解读'
+    : isWeeklyReading()
+      ? '本周运势解读'
+      : (isSingleSpread() ? '本次牌意解读' : '完整牌阵解读');
+  $('interpretTheme').textContent = isDailyReading()
     ? '把牌面当作今天的观察提示，核对现实后再决定如何行动。'
-    : `问题类型：${TOPICS[state.topic].label}。内容由78张牌义、正逆位主题、牌阵位置和组合关系共同生成，没有调用大模型。`;
+    : isWeeklyReading()
+      ? `本周范围：${state.periodLabel || getLocalWeekInfo().label}。把牌面作为规划一周的观察地图，而不是不可改变的预言。`
+      : `问题类型：${TOPICS[state.topic].label}。内容由78张牌义、正逆位主题、牌阵位置和组合关系共同生成。`;
   $('spreadAnswer').textContent = buildOverallSummary();
 
-  $('patternList').innerHTML = insights
-    .map(item => `<li>${safe(item)}</li>`)
-    .join('');
+  $('patternList').innerHTML = insights.map(item => `<li>${safe(item)}</li>`).join('');
 
-  const narrativeLinks = window.LifeMirrorV16?.narrativeLinks(state.selected, positions, state.topic) || [];
+  const narrativeLinks = window.LifeMirrorV17?.narrativeLinks(state.selected, positions, state.topic) || [];
   const narrativeSection = $('narrativeSection');
   if (narrativeSection) narrativeSection.hidden = !narrativeLinks.length;
-  if ($('narrativeList')) $('narrativeList').innerHTML = narrativeLinks.map(item => `<li>${safe(item)}</li>`).join('');
+  if ($('narrativeList')) $('narrativeList').innerHTML = narrativeLinks.slice(0, 8).map(item => `<li>${safe(item)}</li>`).join('');
 
   $('interpretationList').innerHTML = state.selected
     .map((selection, index) => cardReadingHTML(selection, index, positions[index]))
@@ -963,13 +1073,29 @@ function beginReflection() {
   setDialogue(
     isDailyReading()
       ? '今天最值得带走的是哪一句提醒？'
-      : '本地规则给出的是一套可核对的解释，而不是最终判决。\n结合你的真实处境，哪一点最像是在描述现在？'
+      : isWeeklyReading()
+        ? '本周最值得记住的主线是什么？'
+        : '本地规则给出的是一套可核对的解释，而不是最终判决。\n结合你的真实处境，哪一点最像是在描述现在？'
   );
 
-  showInput('textarea', isDailyReading() ? '写下今天最有感觉的一点……' : '写下你自己的理解，而不是照抄牌义……', state.reflection, value => {
+  const reflectionPlaceholder = isDailyReading()
+    ? '写下今天最有感觉的一点……'
+    : isWeeklyReading()
+      ? '写下本周最值得留意的主题……'
+      : '写下你自己的理解，而不是照抄牌义……';
+  showInput('textarea', reflectionPlaceholder, state.reflection, value => {
     state.reflection = value;
-    setDialogue(isDailyReading() ? '为今天留一个小而具体的行动。' : '最后，为自己留一个小而具体、可以验证的下一步。');
-    showInput('textarea', isDailyReading() ? '例如：今天先完成最重要的一件小事。' : '例如：把事实与猜测分开写下来，并进行一次直接沟通。', state.nextAction, action => {
+    setDialogue(isDailyReading()
+      ? '为今天留一个小而具体的行动。'
+      : isWeeklyReading()
+        ? '为本周安排一个可执行、可以在周末回看的行动。'
+        : '最后，为自己留一个小而具体、可以验证的下一步。');
+    const actionPlaceholder = isDailyReading()
+      ? '例如：今天先完成最重要的一件小事。'
+      : isWeeklyReading()
+        ? '例如：周三前完成关键任务，并预留一次恢复时间。'
+        : '例如：把事实与猜测分开写下来，并进行一次直接沟通。';
+    showInput('textarea', actionPlaceholder, state.nextAction, action => {
       state.nextAction = action;
       completeSession();
     });
@@ -984,7 +1110,10 @@ function getCurrentReadingSnapshot() {
     date: new Date().toLocaleString(),
     readingType: state.readingType || 'reflection',
     dayKey: state.dayKey || '',
+    weekKey: state.weekKey || '',
+    periodLabel: state.periodLabel || '',
     dailyMode: isDailyReading() ? (isSingleSpread() ? 'single' : 'three') : '',
+    weeklyMode: isWeeklyReading() ? (state.spread === 'weekly-seven' ? 'seven' : 'three') : '',
     topicKey: state.topic,
     topic: TOPICS[state.topic]?.label || '自我反思',
     question: state.question,
@@ -1009,15 +1138,21 @@ function getCurrentReadingSnapshot() {
 
 function completeSession() {
   const record = window.LifeMirrorStorage.save(getCurrentReadingSnapshot());
-
-  setDialogue(
-    isDailyReading()
-      ? `今天的运势记录已保存在当前设备。
+  const text = isDailyReading()
+    ? `今天的运势记录已保存在当前设备。
 
 你的感受：
 ${state.reflection}
 
 今日行动：
+${state.nextAction}`
+    : isWeeklyReading()
+      ? `本周运势记录已保存在当前设备。
+
+本周主线：
+${state.reflection}
+
+本周行动：
 ${state.nextAction}`
       : `这次记录已保存在当前设备。
 
@@ -1028,9 +1163,8 @@ ${state.question}
 ${state.reflection}
 
 下一步：
-${state.nextAction}`
-  );
-
+${state.nextAction}`;
+  setDialogue(text);
   ghost('查看完整解读', () => showFullInterpretation(0));
   ghost('生成分享卡', () => window.LifeMirrorShare?.open(record));
   primary('返回首页', reset);
@@ -1039,6 +1173,8 @@ ${state.nextAction}`
 function chooseTopic() {
   state.readingType = 'reflection';
   state.dayKey = '';
+  state.weekKey = '';
+  state.periodLabel = '';
   state.recordId = '';
   state.step = 1;
   renderProgress();
@@ -1094,15 +1230,15 @@ function setSpread(spread) {
   setDialogue(
     isDailyReading()
       ? '把注意力放在今天，然后点击牌堆三次。\n电脑端也可以连续按三次空格键。'
-      : '在心里轻轻重复你的问题，然后点击牌堆三次。\n电脑端也可以连续按三次空格键。'
+      : isWeeklyReading()
+        ? `把注意力放在${state.periodLabel || '这一周'}，然后点击牌堆三次。\n电脑端也可以连续按三次空格键。`
+        : '在心里轻轻重复你的问题，然后点击牌堆三次。\n电脑端也可以连续按三次空格键。'
   );
 
   primary('快速洗牌', () => {
     if (state.shuffled) return;
     const remaining = Math.max(0, 3 - state.shuffleCount);
-    for (let index = 0; index < remaining; index++) {
-      setTimeout(shuffleOnce, index * 170);
-    }
+    for (let index = 0; index < remaining; index++) setTimeout(shuffleOnce, index * 170);
   });
 }
 
@@ -1122,11 +1258,15 @@ function restoreSavedReading(record) {
     return;
   }
 
+  const readingType = record.readingType || 'daily';
+  const defaultSpread = readingType === 'weekly'
+    ? (selected.length === 7 ? 'weekly-seven' : 'weekly-three')
+    : (selected.length === 1 ? 'daily-single' : 'daily-three');
   Object.assign(state, {
     step: 4,
-    topic: record.topicKey || 'daily',
-    question: record.question || '今天的整体运势与提醒是什么？',
-    spread: record.spread || (selected.length === 1 ? 'daily-single' : 'daily-three'),
+    topic: record.topicKey || readingType,
+    question: record.question || (readingType === 'weekly' ? '本周的整体运势与提醒是什么？' : '今天的整体运势与提醒是什么？'),
+    spread: record.spread || defaultSpread,
     shuffleCount: 3,
     shuffled: false,
     selected,
@@ -1136,9 +1276,11 @@ function restoreSavedReading(record) {
     shuffledDeck: [],
     chosenNumbers: selected.map(item => item.deckNumber).filter(Number.isInteger),
     drawMode: record.drawMode || 'manual',
-    readingType: record.readingType || 'daily',
-    dayKey: record.dayKey || localDayKey(),
-    recordId: record.id || `daily-${localDayKey()}`
+    readingType,
+    dayKey: record.dayKey || (readingType === 'daily' ? localDayKey() : ''),
+    weekKey: record.weekKey || (readingType === 'weekly' ? getLocalWeekInfo().key : ''),
+    periodLabel: record.periodLabel || (readingType === 'weekly' ? getLocalWeekInfo().label : ''),
+    recordId: record.id || (readingType === 'weekly' ? `weekly-${getLocalWeekInfo().key}` : `daily-${localDayKey()}`)
   });
 
   panel.hidden = true;
@@ -1147,8 +1289,7 @@ function restoreSavedReading(record) {
   renderProgress();
 
   state.selected.forEach((selection, index) => {
-    const targetIndex = isSingleSpread() ? 1 : index;
-    const slot = document.querySelector(`[data-slot="${targetIndex}"]`);
+    const slot = document.querySelector(`[data-slot="${index}"]`);
     slot?.querySelector('.empty-label')?.remove();
     const cardElement = makeCard(selection);
     cardElement.classList.add('revealed', 'reveal-complete');
@@ -1157,9 +1298,11 @@ function restoreSavedReading(record) {
     cardElement.onclick = () => window.LifeMirrorViewer?.open(selection.card, selection.orientation);
   });
 
-  setDialogue('这是你今天已经留下的本日运势。先回看第一次抽取，再决定今天如何行动。');
-  ghost('记录今日感受', beginReflection);
-  primary('查看本日运势解读', () => showFullInterpretation(0));
+  setDialogue(isWeeklyReading()
+    ? `这是你在${state.periodLabel}留下的本周运势。先回看第一次抽取，再安排本周行动。`
+    : '这是你今天已经留下的本日运势。先回看第一次抽取，再决定今天如何行动。');
+  ghost(isWeeklyReading() ? '记录本周感受' : '记录今日感受', beginReflection);
+  primary(isWeeklyReading() ? '查看本周运势解读' : '查看本日运势解读', () => showFullInterpretation(0));
 }
 
 function chooseDailySpread() {
@@ -1212,6 +1355,61 @@ function beginDailyFortune() {
   ]);
 }
 
+
+function chooseWeeklySpread() {
+  const week = getLocalWeekInfo();
+  Object.assign(state, {
+    step: 1,
+    topic: 'weekly',
+    question: '本周的整体运势与提醒是什么？',
+    spread: 'weekly-three',
+    shuffleCount: 0,
+    shuffled: false,
+    selected: [],
+    observation: null,
+    reflection: '',
+    nextAction: '',
+    shuffledDeck: [],
+    chosenNumbers: [],
+    drawMode: '',
+    readingType: 'weekly',
+    dayKey: '',
+    weekKey: week.key,
+    periodLabel: week.label,
+    recordId: `weekly-${week.key}`
+  });
+
+  panel.hidden = true;
+  renderProgress();
+  renderSlots();
+  clearDeck();
+
+  setDialogue(`本周范围：${week.label}
+选择本周牌阵。`, [
+    { label: '三张牌 · 主线/挑战/力量', onClick: () => setSpread('weekly-three') },
+    { label: '七张牌 · 完整本周地图', onClick: () => setSpread('weekly-seven') }
+  ]);
+}
+
+function beginWeeklyFortune() {
+  const existing = getThisWeekReading();
+  if (!existing) {
+    chooseWeeklySpread();
+    return;
+  }
+
+  setDialogue(`本周（${existing.periodLabel || getLocalWeekInfo().label}）已经留下了一次运势。建议先回看第一次抽取。`, [
+    { label: '查看本周运势', onClick: () => restoreSavedReading(existing) },
+    {
+      label: '重新抽取',
+      onClick: () => {
+        if (confirm('重新抽取会覆盖本周原来的运势记录。确定继续吗？')) chooseWeeklySpread();
+      }
+    },
+    { label: '返回', onClick: reset }
+  ]);
+}
+
 function breathe() {
   setDialogue('慢慢吸气……');
   const sequence = ['稍作停留……', '缓缓呼气……', '准备好了。'];
@@ -1237,11 +1435,13 @@ function start() {
   clearDeck();
 
   const daily = getTodayReading();
+  const weekly = getThisWeekReading();
   setDialogue(
     '欢迎来到生命之镜。\n“如上，如下；如内，如外。”',
     [
       { label: '开始一次抽牌', onClick: chooseTopic },
       { label: daily ? '查看今日运势' : '本日运势', onClick: beginDailyFortune },
+      { label: weekly ? '查看本周运势' : '本周运势', onClick: beginWeeklyFortune },
       { label: '先做一次呼吸', onClick: breathe }
     ]
   );
@@ -1264,6 +1464,8 @@ function reset() {
     drawMode: '',
     readingType: 'reflection',
     dayKey: '',
+    weekKey: '',
+    periodLabel: '',
     recordId: ''
   });
 
@@ -1315,3 +1517,4 @@ start();
 if (requestedAction === 'history') setTimeout(() => window.LifeMirrorHistory?.open(), 200);
 if (requestedAction === 'library') setTimeout(() => window.LifeMirrorLibrary?.open(), 200);
 if (requestedAction === 'daily') setTimeout(beginDailyFortune, 200);
+if (requestedAction === 'weekly') setTimeout(beginWeeklyFortune, 200);
