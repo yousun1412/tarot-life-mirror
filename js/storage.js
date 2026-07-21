@@ -14,10 +14,14 @@
       id: record.id || uid(),
       timestamp,
       date: record.date || new Date(timestamp).toLocaleString(),
+      readingType: record.readingType || (record.topicKey === 'daily' ? 'daily' : 'reflection'),
+      dayKey: record.dayKey || '',
+      dailyMode: record.dailyMode || '',
       topicKey: record.topicKey || '',
       topic: record.topic || '未分类',
       question: record.question || '未记录问题',
       spread: record.spread || 'single',
+      drawMode: record.drawMode === 'fate' ? 'fate' : 'manual',
       cards: Array.isArray(record.cards) ? record.cards.map((item, index) => {
         const card = resolveCard(item);
         return {
@@ -26,8 +30,15 @@
           en: card?.en || item.en || '',
           image: card?.image || item.image || '',
           orientation: item.orientation === 'reversed' ? 'reversed' : 'upright',
-          position: item.position || (record.spread === 'three' ? ['当前状态','需要看见','可以行动'][index] : '此刻需要看见'),
-          deckNumber: Number.isInteger(Number(item.deckNumber)) ? Number(item.deckNumber) : null
+          position: item.position || (
+            record.spread === 'daily-three'
+              ? ['今日主线','今日需要留意','今日行动建议'][index]
+              : record.spread === 'three'
+                ? ['当前状态','需要看见','可以行动'][index]
+                : record.spread === 'daily-single' ? '今日主题' : '此刻需要看见'
+          ),
+          deckNumber: Number.isInteger(Number(item.deckNumber)) ? Number(item.deckNumber) : null,
+          drawMode: item.drawMode === 'fate' ? 'fate' : (record.drawMode === 'fate' ? 'fate' : 'manual')
         };
       }) : [],
       summary: record.summary || '',
@@ -51,7 +62,11 @@
   }
 
   function write(records) {
-    localStorage.setItem(KEY, JSON.stringify(records.slice(0, MAX_RECORDS)));
+    try {
+      localStorage.setItem(KEY, JSON.stringify(records.slice(0, MAX_RECORDS)));
+    } catch (error) {
+      console.warn('History write failed:', error);
+    }
     window.dispatchEvent(new CustomEvent('life-mirror-history-change'));
   }
 
@@ -65,7 +80,7 @@
   }
 
   function remove(id) { write(load().filter(item => item.id !== id)); }
-  function clear() { localStorage.removeItem(KEY); window.dispatchEvent(new CustomEvent('life-mirror-history-change')); }
+  function clear() { try { localStorage.removeItem(KEY); } catch (error) { console.warn('History clear failed:', error); } window.dispatchEvent(new CustomEvent('life-mirror-history-change')); }
   function update(id, patch) {
     const records = load();
     const index = records.findIndex(item => item.id === id);
@@ -80,7 +95,7 @@
   }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify({ version: 13, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ version: 16, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;

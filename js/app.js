@@ -20,6 +20,10 @@ const TOPICS = {
   decision: {
     label: '一个具体决定',
     note: '重点比较事实、价值、代价、风险和可以验证的下一步。'
+  },
+  daily: {
+    label: '本日运势',
+    note: '把牌面作为今天的观察提示：留意正在发生的条件，并把建议落实为一个小行动。'
   }
 };
 
@@ -43,6 +47,26 @@ const POSITION_RULES = {
     label: '可以行动',
     role: '行动',
     prompt: '这张牌用于形成一个现实、可执行的下一步。'
+  },
+  dailySingle: {
+    label: '今日主题',
+    role: '核心视角',
+    prompt: '这张牌呈现今天最值得留意和使用的核心主题。'
+  },
+  dailyFlow: {
+    label: '今日主线',
+    role: '趋势',
+    prompt: '这张牌描述今天较可能贯穿始终的主线与发展方向。'
+  },
+  dailyWatch: {
+    label: '今日需要留意',
+    role: '盲点',
+    prompt: '这张牌提醒今天容易被忽略、放大或使用失衡的部分。'
+  },
+  dailyAction: {
+    label: '今日行动建议',
+    role: '行动',
+    prompt: '这张牌帮助你把今天的提示转化为一个具体行动。'
   }
 };
 
@@ -59,7 +83,10 @@ const state = {
   nextAction: '',
   shuffledDeck: [],
   chosenNumbers: [],
-  drawMode: ''
+  drawMode: '',
+  readingType: 'reflection',
+  dayKey: '',
+  recordId: ''
 };
 
 const $ = id => document.getElementById(id);
@@ -144,18 +171,51 @@ function showToast(text) {
   setTimeout(() => toast.classList.remove('show'), 1600);
 }
 
+function localDayKey(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function isSingleSpread() {
+  return state.spread === 'single' || state.spread === 'daily-single';
+}
+
+function requiredCardCount() {
+  return isSingleSpread() ? 1 : 3;
+}
+
+function isDailyReading() {
+  return state.readingType === 'daily';
+}
+
+function getTodayReading() {
+  const key = localDayKey();
+  return window.LifeMirrorStorage?.load().find(record => record.readingType === 'daily' && record.dayKey === key) || null;
+}
+
 function getPositions() {
+  if (state.spread === 'daily-single') return [POSITION_RULES.dailySingle];
+  if (state.spread === 'daily-three') return [POSITION_RULES.dailyFlow, POSITION_RULES.dailyWatch, POSITION_RULES.dailyAction];
   return state.spread === 'single'
     ? [POSITION_RULES.single]
     : [POSITION_RULES.current, POSITION_RULES.awareness, POSITION_RULES.action];
 }
 
+function getSlotLabels() {
+  if (state.spread === 'daily-single') return ['', '今日主题', ''];
+  if (state.spread === 'daily-three') return ['今日主线', '今日需要留意', '今日行动建议'];
+  return ['当前状态', state.spread === 'single' ? '此刻需要看见' : '需要看见', '可以行动'];
+}
+
 function renderSlots() {
-  document.querySelector('.spread')?.classList.toggle('single-mode', state.spread === 'single');
+  const single = isSingleSpread();
+  document.querySelector('.spread')?.classList.toggle('single-mode', single);
+  const labels = getSlotLabels();
   document.querySelectorAll('.slot').forEach((slot, index) => {
-    const labels = ['当前状态', state.spread === 'single' ? '此刻需要看见' : '需要看见', '可以行动'];
     slot.innerHTML = `<span class="empty-label">${labels[index]}</span><span class="slot-label">${labels[index]}</span>`;
-    slot.classList.toggle('hidden', state.spread === 'single' && index !== 1);
+    slot.classList.toggle('hidden', single && index !== 1);
   });
 }
 
@@ -257,7 +317,7 @@ function finishShuffle() {
 }
 
 function chooseDrawMethod() {
-  const required = state.spread === 'single' ? 1 : 3;
+  const required = requiredCardCount();
   setDialogue(
     `牌已经洗好，并保持叠成一摞。\n这次由你选择数字，还是交给命运随机抽取${required === 1 ? '一张牌' : '三张不重复的牌'}？`,
     [
@@ -287,7 +347,7 @@ function chooseDrawMethod() {
 
 function beginFateDraw() {
   setDialogue(
-    state.spread === 'single'
+    isSingleSpread()
       ? '你把这次选择交给了命运。牌堆会随机给出一张牌。'
       : '你把这次选择交给了命运。牌堆会依次随机给出三张不重复的牌。'
   );
@@ -303,7 +363,7 @@ function drawNextFateCard() {
   if (!available.length) return;
   const number = available[randomInt(available.length)];
   const next = state.selected.length + 1;
-  const required = state.spread === 'single' ? 1 : 3;
+  const required = requiredCardCount();
   message.textContent = required === 1
     ? '牌堆正在为你选出一张牌……'
     : `牌堆正在选出第 ${next}/${required} 张牌……`;
@@ -312,14 +372,14 @@ function drawNextFateCard() {
 
 function promptCardNumber() {
   const total = state.shuffledDeck.length;
-  const required = state.spread === 'single' ? 1 : 3;
+  const required = requiredCardCount();
   const next = state.chosenNumbers.length + 1;
   const pickedText = state.chosenNumbers.length
     ? `\n已选择：${state.chosenNumbers.join('、')}`
     : '';
 
   setDialogue(
-    state.spread === 'single'
+    isSingleSpread()
       ? `牌已经洗好，并保持叠成一摞。\n请凭第一感觉选择 1–${total} 中的一个数字。`
       : `牌已经洗好，并保持叠成一摞。\n请选择第 ${next}/${required} 个数字（1–${total}），三个数字不能重复。${pickedText}`
   );
@@ -351,7 +411,7 @@ function promptCardNumber() {
     drawCardByNumber(value);
   };
 
-  primary(state.spread === 'single' ? '按这个数字抽牌' : `确认第 ${next} 个数字`, submit);
+  primary(isSingleSpread() ? '按这个数字抽牌' : `确认第 ${next} 个数字`, submit);
   const input = $('cardNumberInput');
   input.addEventListener('keydown', event => {
     if (event.key === 'Enter') {
@@ -397,7 +457,7 @@ function makeCard(selection) {
 
 function drawCardByNumber(number, options = {}) {
   if (!state.shuffled || state.step !== 2) return;
-  const required = state.spread === 'single' ? 1 : 3;
+  const required = requiredCardCount();
   if (state.selected.length >= required) return;
 
   const card = state.shuffledDeck[number - 1];
@@ -408,7 +468,7 @@ function drawCardByNumber(number, options = {}) {
 
   const orientation = randomOrientation();
   const selection = { card, orientation, deckNumber: number, drawMode: state.drawMode || 'manual' };
-  const targetIndex = state.spread === 'single' ? 1 : state.selected.length;
+  const targetIndex = isSingleSpread() ? 1 : state.selected.length;
   const slot = document.querySelector(`[data-slot="${targetIndex}"]`);
   slot.querySelector('.empty-label')?.remove();
   slot.insertBefore(makeCard(selection), slot.firstChild);
@@ -521,15 +581,20 @@ function saveObservation(cardIndex, label, meaning) {
   renderProgress();
 
   setDialogue(
-    `你先注意到了“${label}”。\n本地解读引擎会结合问题类型、正逆位、牌阵位置、共同主题和牌与牌之间的关系生成完整解读。`
+    isDailyReading()
+      ? `你先注意到了“${label}”。
+接下来看看这张牌如何成为今天的提醒。`
+      : `你先注意到了“${label}”。
+本地解读引擎会结合问题类型、正逆位、牌阵位置、共同主题和牌与牌之间的关系生成完整解读。`
   );
 
   document.querySelectorAll('.tarot-card').forEach((card, index) => {
     card.onclick = () => window.LifeMirrorViewer?.open(state.selected[index].card, state.selected[index].orientation);
   });
 
-  ghost('进入反思', beginReflection);
-  primary('查看完整牌阵解读', () => showFullInterpretation(cardIndex));
+  if (isDailyReading()) window.LifeMirrorStorage?.save(getCurrentReadingSnapshot());
+  ghost(isDailyReading() ? '记录今日感受' : '进入反思', beginReflection);
+  primary(isDailyReading() ? '查看本日运势解读' : '查看完整牌阵解读', () => showFullInterpretation(cardIndex));
 }
 
 function isBinaryQuestion() {
@@ -543,8 +608,8 @@ function getOrientationData(selection) {
 }
 
 function buildCardAnswer(selection, position) {
-  if (window.LifeMirrorV15) {
-    return window.LifeMirrorV15.cardAnswer(selection, position, state.topic, state.question, isBinaryQuestion());
+  if (window.LifeMirrorV16) {
+    return window.LifeMirrorV16.cardAnswer(selection, position, state.topic, state.question, isBinaryQuestion());
   }
   const { card, orientation } = selection;
   const data = getOrientationData(selection);
@@ -573,8 +638,8 @@ function buildCardAnswer(selection, position) {
 }
 
 function positionSpecificText(selection, position) {
-  if (window.LifeMirrorV15) {
-    return window.LifeMirrorV15.positionText(selection.card, state.topic, selection.orientation, position.role);
+  if (window.LifeMirrorV16) {
+    return window.LifeMirrorV16.positionText(selection.card, state.topic, selection.orientation, position.role);
   }
   const { card, orientation } = selection;
   const data = getOrientationData(selection);
@@ -699,7 +764,7 @@ function analyzePatterns() {
   insights.push(...getDeckStructureInsights());
   if (energy) insights.push(energy);
   insights.push(...getPairInsights());
-  if (window.LifeMirrorV15) insights.push(...window.LifeMirrorV15.extraPatterns(state.selected));
+  if (window.LifeMirrorV16) insights.push(...window.LifeMirrorV16.extraPatterns(state.selected));
 
   if (state.observation) {
     const selection = state.selected[state.observation.cardIndex];
@@ -713,8 +778,8 @@ function analyzePatterns() {
 
 function buildSingleSummary() {
   const selection = state.selected[0];
-  const position = POSITION_RULES.single;
-  if (window.LifeMirrorV15) return window.LifeMirrorV15.buildSingleSummary({ selection, position, topic: state.topic, question: state.question, binary: isBinaryQuestion() });
+  const position = getPositions()[0];
+  if (window.LifeMirrorV16) return window.LifeMirrorV16.buildSingleSummary({ selection, position, topic: state.topic, question: state.question, binary: isBinaryQuestion() });
   return [
     `关于“${state.question}”，${selection.card.name}${orientationLabel(selection)}没有给出一个固定预言，而是把注意力放在“${selection.card.theme}”上。`,
     buildCardAnswer(selection, position),
@@ -726,7 +791,7 @@ function buildThreeCardSummary() {
   const positions = getPositions();
   const [current, awareness, action] = state.selected;
   const topic = TOPICS[state.topic];
-  if (window.LifeMirrorV15) return window.LifeMirrorV15.buildThreeSummary({ selected: state.selected, positions, topic: state.topic, question: state.question, binary: isBinaryQuestion(), topicNote: topic.note });
+  if (window.LifeMirrorV16) return window.LifeMirrorV16.buildThreeSummary({ selected: state.selected, positions, topic: state.topic, question: state.question, binary: isBinaryQuestion(), topicNote: topic.note });
 
   const intro = isBinaryQuestion()
     ? `关于“${state.question}”，这组三张牌不适合被压缩成简单的“会”或“不会”。它更像一条从现状、盲点到行动条件的路径。`
@@ -799,7 +864,7 @@ function cardReadingHTML(selection, index, position) {
 
       <section class="topic-meaning-v15">
         <h3>结合“${safe(TOPICS[state.topic].label)}”的${orientationText}解读</h3>
-        <p>${safe(window.LifeMirrorV15?.topicText(card, state.topic, orientation) || card.topics[state.topic] || card.theme)}</p>
+        <p>${safe(window.LifeMirrorV16?.topicText(card, state.topic, orientation) || card.topics[state.topic] || card.theme)}</p>
       </section>
 
       <section class="orientation-meaning ${orientation}">
@@ -848,16 +913,19 @@ function showFullInterpretation(focusIndex = 0) {
   const positions = getPositions();
   const insights = analyzePatterns();
 
-  $('interpretSpreadLabel').innerHTML = `<span class="interpretation-engine-badge">✦ V15 解读引擎 2.0</span><br>${state.spread === 'single' ? '单牌规则解读' : '三牌规则解读'}`;
-  $('interpretTitle').textContent = state.spread === 'single' ? '本次牌意解读' : '完整牌阵解读';
-  $('interpretTheme').textContent = `问题类型：${TOPICS[state.topic].label}。内容由78张牌义、正逆位主题、牌阵位置和组合关系共同生成，没有调用大模型。`;
+  const daily = isDailyReading();
+  $('interpretSpreadLabel').innerHTML = `<span class="interpretation-engine-badge">✦ V16 本日运势</span><br>${isSingleSpread() ? '单牌规则解读' : '三牌规则解读'}`;
+  $('interpretTitle').textContent = daily ? '本日运势解读' : (isSingleSpread() ? '本次牌意解读' : '完整牌阵解读');
+  $('interpretTheme').textContent = daily
+    ? '把牌面当作今天的观察提示，核对现实后再决定如何行动。'
+    : `问题类型：${TOPICS[state.topic].label}。内容由78张牌义、正逆位主题、牌阵位置和组合关系共同生成，没有调用大模型。`;
   $('spreadAnswer').textContent = buildOverallSummary();
 
   $('patternList').innerHTML = insights
     .map(item => `<li>${safe(item)}</li>`)
     .join('');
 
-  const narrativeLinks = window.LifeMirrorV15?.narrativeLinks(state.selected, positions, state.topic) || [];
+  const narrativeLinks = window.LifeMirrorV16?.narrativeLinks(state.selected, positions, state.topic) || [];
   const narrativeSection = $('narrativeSection');
   if (narrativeSection) narrativeSection.hidden = !narrativeLinks.length;
   if ($('narrativeList')) $('narrativeList').innerHTML = narrativeLinks.map(item => `<li>${safe(item)}</li>`).join('');
@@ -893,13 +961,15 @@ function beginReflection() {
   renderProgress();
 
   setDialogue(
-    '本地规则给出的是一套可核对的解释，而不是最终判决。\n结合你的真实处境，哪一点最像是在描述现在？'
+    isDailyReading()
+      ? '今天最值得带走的是哪一句提醒？'
+      : '本地规则给出的是一套可核对的解释，而不是最终判决。\n结合你的真实处境，哪一点最像是在描述现在？'
   );
 
-  showInput('textarea', '写下你自己的理解，而不是照抄牌义……', '', value => {
+  showInput('textarea', isDailyReading() ? '写下今天最有感觉的一点……' : '写下你自己的理解，而不是照抄牌义……', state.reflection, value => {
     state.reflection = value;
-    setDialogue('最后，为自己留一个小而具体、可以验证的下一步。');
-    showInput('textarea', '例如：把事实与猜测分开写下来，并进行一次直接沟通。', '', action => {
+    setDialogue(isDailyReading() ? '为今天留一个小而具体的行动。' : '最后，为自己留一个小而具体、可以验证的下一步。');
+    showInput('textarea', isDailyReading() ? '例如：今天先完成最重要的一件小事。' : '例如：把事实与猜测分开写下来，并进行一次直接沟通。', state.nextAction, action => {
       state.nextAction = action;
       completeSession();
     });
@@ -909,8 +979,12 @@ function beginReflection() {
 function getCurrentReadingSnapshot() {
   const positions = getPositions();
   return {
+    id: state.recordId || undefined,
     timestamp: Date.now(),
     date: new Date().toLocaleString(),
+    readingType: state.readingType || 'reflection',
+    dayKey: state.dayKey || '',
+    dailyMode: isDailyReading() ? (isSingleSpread() ? 'single' : 'three') : '',
     topicKey: state.topic,
     topic: TOPICS[state.topic]?.label || '自我反思',
     question: state.question,
@@ -937,15 +1011,35 @@ function completeSession() {
   const record = window.LifeMirrorStorage.save(getCurrentReadingSnapshot());
 
   setDialogue(
-    `这次记录已保存在当前设备。\n\n你的问题：\n${state.question}\n\n你自己的理解：\n${state.reflection}\n\n下一步：\n${state.nextAction}`
+    isDailyReading()
+      ? `今天的运势记录已保存在当前设备。
+
+你的感受：
+${state.reflection}
+
+今日行动：
+${state.nextAction}`
+      : `这次记录已保存在当前设备。
+
+你的问题：
+${state.question}
+
+你自己的理解：
+${state.reflection}
+
+下一步：
+${state.nextAction}`
   );
 
   ghost('查看完整解读', () => showFullInterpretation(0));
   ghost('生成分享卡', () => window.LifeMirrorShare?.open(record));
-  primary('重新开始', reset);
+  primary('返回首页', reset);
 }
 
 function chooseTopic() {
+  state.readingType = 'reflection';
+  state.dayKey = '';
+  state.recordId = '';
   state.step = 1;
   renderProgress();
 
@@ -998,7 +1092,9 @@ function setSpread(spread) {
   createDeck();
 
   setDialogue(
-    '在心里轻轻重复你的问题，然后点击牌堆三次。\n电脑端也可以连续按三次空格键。'
+    isDailyReading()
+      ? '把注意力放在今天，然后点击牌堆三次。\n电脑端也可以连续按三次空格键。'
+      : '在心里轻轻重复你的问题，然后点击牌堆三次。\n电脑端也可以连续按三次空格键。'
   );
 
   primary('快速洗牌', () => {
@@ -1008,6 +1104,112 @@ function setSpread(spread) {
       setTimeout(shuffleOnce, index * 170);
     }
   });
+}
+
+function restoreSavedReading(record) {
+  const selected = (record.cards || []).map(raw => {
+    const card = TAROT_CARDS.find(item => item.id === raw.id) || TAROT_CARDS.find(item => item.name === raw.name);
+    return card ? {
+      card,
+      orientation: raw.orientation === 'reversed' ? 'reversed' : 'upright',
+      deckNumber: raw.deckNumber ?? null,
+      drawMode: raw.drawMode || record.drawMode || 'manual'
+    } : null;
+  }).filter(Boolean);
+
+  if (!selected.length) {
+    showToast('这条记录缺少可读取的牌面');
+    return;
+  }
+
+  Object.assign(state, {
+    step: 4,
+    topic: record.topicKey || 'daily',
+    question: record.question || '今天的整体运势与提醒是什么？',
+    spread: record.spread || (selected.length === 1 ? 'daily-single' : 'daily-three'),
+    shuffleCount: 3,
+    shuffled: false,
+    selected,
+    observation: record.observation || null,
+    reflection: record.reflection || '',
+    nextAction: record.nextAction || '',
+    shuffledDeck: [],
+    chosenNumbers: selected.map(item => item.deckNumber).filter(Number.isInteger),
+    drawMode: record.drawMode || 'manual',
+    readingType: record.readingType || 'daily',
+    dayKey: record.dayKey || localDayKey(),
+    recordId: record.id || `daily-${localDayKey()}`
+  });
+
+  panel.hidden = true;
+  clearDeck();
+  renderSlots();
+  renderProgress();
+
+  state.selected.forEach((selection, index) => {
+    const targetIndex = isSingleSpread() ? 1 : index;
+    const slot = document.querySelector(`[data-slot="${targetIndex}"]`);
+    slot?.querySelector('.empty-label')?.remove();
+    const cardElement = makeCard(selection);
+    cardElement.classList.add('revealed', 'reveal-complete');
+    if (selection.orientation === 'reversed') cardElement.classList.add('turn-reversed');
+    slot?.insertBefore(cardElement, slot.firstChild);
+    cardElement.onclick = () => window.LifeMirrorViewer?.open(selection.card, selection.orientation);
+  });
+
+  setDialogue('这是你今天已经留下的本日运势。先回看第一次抽取，再决定今天如何行动。');
+  ghost('记录今日感受', beginReflection);
+  primary('查看本日运势解读', () => showFullInterpretation(0));
+}
+
+function chooseDailySpread() {
+  Object.assign(state, {
+    step: 1,
+    topic: 'daily',
+    question: '今天的整体运势与提醒是什么？',
+    spread: 'daily-single',
+    shuffleCount: 0,
+    shuffled: false,
+    selected: [],
+    observation: null,
+    reflection: '',
+    nextAction: '',
+    shuffledDeck: [],
+    chosenNumbers: [],
+    drawMode: '',
+    readingType: 'daily',
+    dayKey: localDayKey(),
+    recordId: `daily-${localDayKey()}`
+  });
+
+  panel.hidden = true;
+  renderProgress();
+  renderSlots();
+  clearDeck();
+
+  setDialogue('选择今天的牌阵。', [
+    { label: '一张牌 · 今日主题', onClick: () => setSpread('daily-single') },
+    { label: '三张牌 · 主线/留意/行动', onClick: () => setSpread('daily-three') }
+  ]);
+}
+
+function beginDailyFortune() {
+  const existing = getTodayReading();
+  if (!existing) {
+    chooseDailySpread();
+    return;
+  }
+
+  setDialogue('今天已经留下了一次本日运势。建议先回看第一次抽取。', [
+    { label: '查看今日运势', onClick: () => restoreSavedReading(existing) },
+    {
+      label: '重新抽取',
+      onClick: () => {
+        if (confirm('重新抽取会覆盖今天原来的本日运势记录。确定继续吗？')) chooseDailySpread();
+      }
+    },
+    { label: '返回', onClick: reset }
+  ]);
 }
 
 function breathe() {
@@ -1029,14 +1231,17 @@ function renderHistory() { window.LifeMirrorHistory?.render(); }
 
 function start() {
   state.step = 0;
+  state.readingType = 'reflection';
   renderProgress();
   renderSlots();
   clearDeck();
 
+  const daily = getTodayReading();
   setDialogue(
-    '欢迎来到这张安静的桌子。\nV15 不使用大模型，采用完整78张 Rider–Waite–Smith 塔罗牌面，并升级了正逆位主题、位置作用与多牌连接解读。洗牌后可以自己选择1–78的数字，也可以选择“交给命运”随机抽取。',
+    '欢迎来到生命之镜。\n“如上，如下；如内，如外。”',
     [
-      { label: '开始', onClick: chooseTopic },
+      { label: '开始一次抽牌', onClick: chooseTopic },
+      { label: daily ? '查看今日运势' : '本日运势', onClick: beginDailyFortune },
       { label: '先做一次呼吸', onClick: breathe }
     ]
   );
@@ -1056,7 +1261,10 @@ function reset() {
     nextAction: '',
     shuffledDeck: [],
     chosenNumbers: [],
-    drawMode: ''
+    drawMode: '',
+    readingType: 'reflection',
+    dayKey: '',
+    recordId: ''
   });
 
   panel.hidden = true;
@@ -1106,3 +1314,4 @@ const requestedAction = new URLSearchParams(location.search).get('action');
 start();
 if (requestedAction === 'history') setTimeout(() => window.LifeMirrorHistory?.open(), 200);
 if (requestedAction === 'library') setTimeout(() => window.LifeMirrorLibrary?.open(), 200);
+if (requestedAction === 'daily') setTimeout(beginDailyFortune, 200);

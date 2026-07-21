@@ -1,0 +1,8 @@
+/* V16：本日运势 */
+.answer-block:before{content:'V16'}
+.topic-meaning-v15{background:linear-gradient(135deg,rgba(91,74,115,.16),rgba(36,78,69,.14))}
+.dialogue .choices .choice{min-height:39px}
+.spread .slot-label{max-width:118px;text-align:center;line-height:1.35}
+.history-item[data-reading-type="daily"]{border-color:rgba(233,197,124,.34);box-shadow:0 12px 30px rgba(174,121,54,.08)}
+.daily-record-badge{display:inline-flex;margin-left:6px;padding:2px 7px;border-radius:999px;background:rgba(233,197,124,.12);border:1px solid rgba(233,197,124,.22);color:#ead09a;font-size:10px}
+@media(max-width:380px){.spread .slot-label{font-size:10px;white-space:normal;width:92px}}

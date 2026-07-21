@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "生命之镜塔罗 V15",
+  "name": "生命之镜塔罗 V16",
   "short_name": "生命之镜",
-  "description": "可安装、可离线、无需大模型的完整78张塔罗应用，支持自己选择1–78数字或交给命运随机抽牌。",
+  "description": "可安装、可离线的完整78张塔罗应用，支持普通抽牌与本日运势。",
   "lang": "zh-CN",
   "start_url": "./index.html",
   "scope": "./",
@@ -44,6 +44,17 @@
       "name": "开始一次抽牌",
       "short_name": "开始抽牌",
       "url": "./index.html?action=start",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "查看本日运势",
+      "short_name": "本日运势",
+      "url": "./index.html?action=daily",
       "icons": [
         {
           "src": "./icons/icon-192.png",
