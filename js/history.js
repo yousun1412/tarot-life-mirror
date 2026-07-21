@@ -10,7 +10,7 @@
     list.innerHTML=records.map(record=>{
       const cards=record.cards.map(raw=>{const card=cardData(raw);return `<button class="history-card-mini ${raw.orientation==='reversed'?'reversed':''}" data-view-card="${card.id}" data-orientation="${raw.orientation}" title="放大${safe(card.name)}"><img src="${safe(card.image)}" alt="${safe(card.name)}"><span>${safe(card.name)}${raw.orientation==='reversed'?'（逆）':''}${raw.deckNumber?` · #${raw.deckNumber}`:''}</span></button>`;}).join('');
       return `<article class="history-item ${record.favorite?'favorite':''}" data-record-id="${safe(record.id)}">
-        <span class="tiny-label">${safe(record.date)} · ${safe(record.topic)}</span><h3>${safe(record.question)}</h3><div class="history-card-row">${cards}</div>
+        <span class="tiny-label">${safe(record.date)} · ${safe(record.topic)} · ${record.drawMode==='fate'?'交给命运':'自选数字'}</span><h3>${safe(record.question)}</h3><div class="history-card-row">${cards}</div>
         <p><strong>反思：</strong>${safe(record.reflection||'未填写')}</p><p><strong>下一步：</strong>${safe(record.nextAction||'未填写')}</p>
         <details class="history-detail"><summary>完整摘要与后续记录</summary><p>${safe(record.summary||'')}</p><textarea class="followup-box" placeholder="后来发生了什么？这次牌阵有哪些地方值得修正？">${safe(record.followUp||'')}</textarea><button data-action="save-followup">保存后续记录</button></details>
         <div class="history-item-actions"><button data-action="favorite">${record.favorite?'★ 已收藏':'☆ 收藏'}</button><button data-action="share">生成分享卡</button><button class="danger" data-action="delete">删除</button></div>

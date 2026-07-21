@@ -58,7 +58,8 @@ const state = {
   reflection: '',
   nextAction: '',
   shuffledDeck: [],
-  chosenNumbers: []
+  chosenNumbers: [],
+  drawMode: ''
 };
 
 const $ = id => document.getElementById(id);
@@ -89,6 +90,7 @@ function renderProgress() {
 }
 
 function setDialogue(text, options = []) {
+  document.querySelectorAll('.draw-method-note').forEach(node => node.remove());
   message.textContent = text;
   choices.innerHTML = '';
   actions.innerHTML = '';
@@ -164,7 +166,7 @@ function clearDeck() {
 
 function createDeck() {
   deck.innerHTML = '';
-  deck.className = `deck-wrap${state.shuffled ? ' ready-stack' : ''}`;
+  deck.className = `deck-wrap${state.shuffled ? ' ready-stack' : ''}${state.drawMode === 'fate' && state.step === 2 ? ' fate-drawing' : ''}`;
   const total = TAROT_CARDS.length;
   const remaining = Math.max(0, total - state.chosenNumbers.length);
   const count = Math.min(16, Math.max(7, Math.ceil(remaining / 6)));
@@ -186,11 +188,19 @@ function createDeck() {
   const hint = document.createElement('div');
   hint.className = 'deck-hint';
   hint.textContent = state.shuffled
-    ? `牌保持叠放 · 从 1–${total} 中选择编号`
+    ? state.drawMode === 'manual'
+      ? `牌保持叠放 · 从 1–${total} 中选择编号`
+      : state.drawMode === 'fate'
+        ? '牌保持叠放 · 交给命运随机抽取'
+        : '牌保持叠放 · 请选择抽牌方式'
     : '点击牌堆三次，或按空格键';
   deck.appendChild(hint);
   deck.setAttribute('aria-label', state.shuffled
-    ? `已洗好的${total}张牌。请在下方输入编号抽牌。`
+    ? state.drawMode === 'manual'
+      ? `已洗好的${total}张牌。请在下方输入编号抽牌。`
+      : state.drawMode === 'fate'
+        ? `已洗好的${total}张牌。正在随机抽取。`
+        : `已洗好的${total}张牌。请选择自己选数字或交给命运。`
     : `共${total}张牌，点击三次洗牌。`);
 }
 
@@ -212,10 +222,25 @@ function shuffleOnce() {
   }
 }
 
+function randomInt(max) {
+  if (!Number.isInteger(max) || max <= 0) return 0;
+  if (globalThis.crypto?.getRandomValues) {
+    const limit = Math.floor(0x100000000 / max) * max;
+    const values = new Uint32Array(1);
+    do globalThis.crypto.getRandomValues(values); while (values[0] >= limit);
+    return values[0] % max;
+  }
+  return Math.floor(Math.random() * max);
+}
+
+function randomOrientation() {
+  return randomInt(2) === 0 ? 'upright' : 'reversed';
+}
+
 function shuffledCopy(cards) {
   const result = [...cards];
   for (let index = result.length - 1; index > 0; index--) {
-    const swapIndex = Math.floor(Math.random() * (index + 1));
+    const swapIndex = randomInt(index + 1);
     [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
   }
   return result;
@@ -226,8 +251,63 @@ function finishShuffle() {
   state.shuffled = true;
   state.shuffledDeck = shuffledCopy(TAROT_CARDS);
   state.chosenNumbers = [];
+  state.drawMode = '';
   createDeck();
-  promptCardNumber();
+  chooseDrawMethod();
+}
+
+function chooseDrawMethod() {
+  const required = state.spread === 'single' ? 1 : 3;
+  setDialogue(
+    `牌已经洗好，并保持叠成一摞。\n这次由你选择数字，还是交给命运随机抽取${required === 1 ? '一张牌' : '三张不重复的牌'}？`,
+    [
+      {
+        label: '自己选择数字',
+        onClick: () => {
+          state.drawMode = 'manual';
+          createDeck();
+          promptCardNumber();
+        }
+      },
+      {
+        label: '交给命运',
+        onClick: () => {
+          state.drawMode = 'fate';
+          createDeck();
+          beginFateDraw();
+        }
+      }
+    ]
+  );
+  const note = document.createElement('p');
+  note.className = 'draw-method-note';
+  note.textContent = '两种方式使用同一副已经洗好的牌；“交给命运”只随机选择牌堆位置，不会根据问题改变牌面。';
+  choices.after(note);
+}
+
+function beginFateDraw() {
+  setDialogue(
+    state.spread === 'single'
+      ? '你把这次选择交给了命运。牌堆会随机给出一张牌。'
+      : '你把这次选择交给了命运。牌堆会依次随机给出三张不重复的牌。'
+  );
+  deck.classList.add('fate-drawing');
+  setTimeout(drawNextFateCard, 650);
+}
+
+function drawNextFateCard() {
+  if (!state.shuffled || state.drawMode !== 'fate' || state.step !== 2) return;
+  const total = state.shuffledDeck.length;
+  const available = Array.from({ length: total }, (_, index) => index + 1)
+    .filter(number => !state.chosenNumbers.includes(number));
+  if (!available.length) return;
+  const number = available[randomInt(available.length)];
+  const next = state.selected.length + 1;
+  const required = state.spread === 'single' ? 1 : 3;
+  message.textContent = required === 1
+    ? '牌堆正在为你选出一张牌……'
+    : `牌堆正在选出第 ${next}/${required} 张牌……`;
+  drawCardByNumber(number, { fate: true });
 }
 
 function promptCardNumber() {
@@ -315,7 +395,7 @@ function makeCard(selection) {
   return wrapper;
 }
 
-function drawCardByNumber(number) {
+function drawCardByNumber(number, options = {}) {
   if (!state.shuffled || state.step !== 2) return;
   const required = state.spread === 'single' ? 1 : 3;
   if (state.selected.length >= required) return;
@@ -326,8 +406,8 @@ function drawCardByNumber(number) {
     return;
   }
 
-  const orientation = Math.random() < 0.5 ? 'upright' : 'reversed';
-  const selection = { card, orientation, deckNumber: number };
+  const orientation = randomOrientation();
+  const selection = { card, orientation, deckNumber: number, drawMode: state.drawMode || 'manual' };
   const targetIndex = state.spread === 'single' ? 1 : state.selected.length;
   const slot = document.querySelector(`[data-slot="${targetIndex}"]`);
   slot.querySelector('.empty-label')?.remove();
@@ -339,7 +419,10 @@ function drawCardByNumber(number) {
   showToast(`第 ${number} 张已抽取 · ${state.selected.length}/${required}`);
 
   if (state.selected.length === required) {
-    setTimeout(beginObservation, 500);
+    deck.classList.remove('fate-drawing');
+    setTimeout(beginObservation, options.fate ? 760 : 500);
+  } else if (state.drawMode === 'fate') {
+    setTimeout(drawNextFateCard, 820);
   } else {
     setTimeout(promptCardNumber, 300);
   }
@@ -693,7 +776,7 @@ function cardReadingHTML(selection, index, position) {
       </figure>
       <header class="card-reading-header">
         <div>
-          <span class="tiny-label">第${index + 1}张 · 选择牌堆编号 ${selection.deckNumber ?? "—"} · ${safe(position.label)} · ${safe(position.role)}</span>
+          <span class="tiny-label">第${index + 1}张 · ${selection.drawMode === 'fate' ? '交给命运' : '自选编号'} ${selection.deckNumber ?? "—"} · ${safe(position.label)} · ${safe(position.role)}</span>
           <h2>${safe(card.name)}${orientationLabel(selection)} · ${safe(card.en)}</h2>
           <p>${safe(card.theme)}</p>
         </div>
@@ -813,6 +896,7 @@ function getCurrentReadingSnapshot() {
     topic: TOPICS[state.topic]?.label || '自我反思',
     question: state.question,
     spread: state.spread,
+    drawMode: state.drawMode || 'manual',
     cards: state.selected.map((item, index) => ({
       id: item.card.id,
       name: item.card.name,
@@ -820,7 +904,8 @@ function getCurrentReadingSnapshot() {
       image: item.card.image,
       orientation: item.orientation,
       position: positions[index]?.label || '此刻需要看见',
-      deckNumber: item.deckNumber ?? null
+      deckNumber: item.deckNumber ?? null,
+      drawMode: item.drawMode || state.drawMode || 'manual'
     })),
     summary: buildOverallSummary(),
     observation: state.observation,
@@ -890,6 +975,7 @@ function setSpread(spread) {
   state.shuffled = false;
   state.shuffledDeck = [];
   state.chosenNumbers = [];
+  state.drawMode = '';
   createDeck();
 
   setDialogue(
@@ -929,7 +1015,7 @@ function start() {
   clearDeck();
 
   setDialogue(
-    '欢迎来到这张安静的桌子。\n这个版本不使用大模型，采用完整78张 Rider–Waite–Smith 塔罗牌面，并通过正逆位、问题类型、牌阵位置和组合规则生成解读。',
+    '欢迎来到这张安静的桌子。\nV14 不使用大模型，采用完整78张 Rider–Waite–Smith 塔罗牌面。洗牌后可以自己选择1–78的数字，也可以选择“交给命运”随机抽取。',
     [
       { label: '开始', onClick: chooseTopic },
       { label: '先做一次呼吸', onClick: breathe }
@@ -950,7 +1036,8 @@ function reset() {
     reflection: '',
     nextAction: '',
     shuffledDeck: [],
-    chosenNumbers: []
+    chosenNumbers: [],
+    drawMode: ''
   });
 
   panel.hidden = true;

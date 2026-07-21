@@ -24,7 +24,7 @@
     ctx.strokeStyle='rgba(233,197,124,.45)';ctx.lineWidth=3;ctx.strokeRect(34,34,W-68,H-68);
     ctx.fillStyle='#e9c57c';ctx.font='600 28px sans-serif';ctx.fillText('✦ 生命之镜塔罗',72,92);
     ctx.fillStyle='#f7edd8';ctx.font='700 51px serif';ctx.fillText(target.spread==='three'?'三张反思牌阵':'此刻需要看见',72,162);
-    ctx.fillStyle='rgba(247,237,216,.65)';ctx.font='24px sans-serif';ctx.fillText(`${target.topic || '自我反思'} · ${target.date || new Date().toLocaleDateString()}`,72,205);
+    ctx.fillStyle='rgba(247,237,216,.65)';ctx.font='24px sans-serif';ctx.fillText(`${target.topic || '自我反思'} · ${target.drawMode==='fate'?'交给命运':'自选数字'} · ${target.date || new Date().toLocaleDateString()}`,72,205);
     let y=260;
     if(includeQuestion.checked && target.question){ctx.fillStyle='rgba(255,255,255,.07)';roundedRect(62,y,W-124,128,24);ctx.fillStyle='#f4e9d5';ctx.font='28px sans-serif';y=wrap(`“${target.question}”`,88,y+46,W-176,39,2)+30;} else y+=20;
     const cards=target.cards||[], gap=28, cardW=cards.length===1?330:250, cardH=cardW*1.675, total=cards.length*cardW+(cards.length-1)*gap, start=(W-total)/2;
