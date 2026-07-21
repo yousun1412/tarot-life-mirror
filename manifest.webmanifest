@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "生命之镜塔罗 V12",
+  "name": "生命之镜塔罗 V13",
   "short_name": "生命之镜",
-  "description": "可安装、可离线、无需大模型的塔罗自我反思应用，含完整牌面、牌库、历史记录和分享卡。",
+  "description": "可安装、可离线、无需大模型的完整78张塔罗自我反思应用，支持叠放牌堆与1–78数字抽牌。",
   "lang": "zh-CN",
   "start_url": "./index.html",
   "scope": "./",
@@ -63,8 +63,8 @@
       ]
     },
     {
-      "name": "浏览大阿尔卡那牌库",
-      "short_name": "牌库",
+      "name": "浏览完整78张塔罗牌库",
+      "short_name": "完整牌库",
       "url": "./index.html?action=library",
       "icons": [
         {

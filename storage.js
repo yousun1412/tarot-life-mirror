@@ -26,7 +26,8 @@
           en: card?.en || item.en || '',
           image: card?.image || item.image || '',
           orientation: item.orientation === 'reversed' ? 'reversed' : 'upright',
-          position: item.position || (record.spread === 'three' ? ['当前状态','需要看见','可以行动'][index] : '此刻需要看见')
+          position: item.position || (record.spread === 'three' ? ['当前状态','需要看见','可以行动'][index] : '此刻需要看见'),
+          deckNumber: Number.isInteger(Number(item.deckNumber)) ? Number(item.deckNumber) : null
         };
       }) : [],
       summary: record.summary || '',
@@ -79,7 +80,7 @@
   }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify({ version: 12, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ version: 13, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;

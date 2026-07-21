@@ -8,7 +8,7 @@
     const records=window.LifeMirrorStorage.load().filter(record=>{const hay=[record.question,record.topic,record.reflection,record.nextAction,...record.cards.map(c=>c.name)].join(' ').toLowerCase();return(!query||hay.includes(query))&&(!topic||record.topic===topic);});
     if(!records.length){list.innerHTML='<p class="history-empty-note">没有匹配的本地记录。</p>';return;}
     list.innerHTML=records.map(record=>{
-      const cards=record.cards.map(raw=>{const card=cardData(raw);return `<button class="history-card-mini ${raw.orientation==='reversed'?'reversed':''}" data-view-card="${card.id}" data-orientation="${raw.orientation}" title="放大${safe(card.name)}"><img src="${safe(card.image)}" alt="${safe(card.name)}"><span>${safe(card.name)}${raw.orientation==='reversed'?'（逆）':''}</span></button>`;}).join('');
+      const cards=record.cards.map(raw=>{const card=cardData(raw);return `<button class="history-card-mini ${raw.orientation==='reversed'?'reversed':''}" data-view-card="${card.id}" data-orientation="${raw.orientation}" title="放大${safe(card.name)}"><img src="${safe(card.image)}" alt="${safe(card.name)}"><span>${safe(card.name)}${raw.orientation==='reversed'?'（逆）':''}${raw.deckNumber?` · #${raw.deckNumber}`:''}</span></button>`;}).join('');
       return `<article class="history-item ${record.favorite?'favorite':''}" data-record-id="${safe(record.id)}">
         <span class="tiny-label">${safe(record.date)} · ${safe(record.topic)}</span><h3>${safe(record.question)}</h3><div class="history-card-row">${cards}</div>
         <p><strong>反思：</strong>${safe(record.reflection||'未填写')}</p><p><strong>下一步：</strong>${safe(record.nextAction||'未填写')}</p>

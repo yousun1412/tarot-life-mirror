@@ -32,7 +32,7 @@
       const raw=cards[i], card=cardData(raw), x=start+i*(cardW+gap);
       ctx.fillStyle='rgba(0,0,0,.32)';roundedRect(x-8,y-8,cardW+16,cardH+16,18);
       try{const img=await loadImage(card.image);fitImage(img,x,y,cardW,cardH,raw.orientation==='reversed');}catch(e){ctx.fillStyle='#2b2038';roundedRect(x,y,cardW,cardH,14);ctx.fillStyle='#fff';ctx.font='34px sans-serif';ctx.textAlign='center';ctx.fillText(card.name,x+cardW/2,y+cardH/2);ctx.textAlign='left';}
-      ctx.fillStyle='#f7edd8';ctx.font='700 24px sans-serif';ctx.textAlign='center';ctx.fillText(`${raw.position ? raw.position+'｜' : ''}${card.name}${raw.orientation==='reversed'?'（逆）':''}`,x+cardW/2,y+cardH+42);ctx.textAlign='left';
+      ctx.fillStyle='#f7edd8';ctx.font='700 24px sans-serif';ctx.textAlign='center';ctx.fillText(`${raw.position ? raw.position+'｜' : ''}${card.name}${raw.orientation==='reversed'?'（逆）':''}${raw.deckNumber ? ' · #'+raw.deckNumber : ''}`,x+cardW/2,y+cardH+42);ctx.textAlign='left';
     }
     y += cardH+92;ctx.fillStyle='#e9c57c';ctx.font='700 26px sans-serif';ctx.fillText('本次提示',72,y);y+=46;ctx.fillStyle='#e9deca';ctx.font='26px sans-serif';wrap(target.summary||'把牌面当作一面镜子，核对现实，再决定下一步。',72,y,W-144,39,5);
     ctx.fillStyle='rgba(247,237,216,.48)';ctx.font='20px sans-serif';ctx.fillText('用于塔罗文化学习、娱乐与自我反思，不构成确定性预测。',72,H-82);

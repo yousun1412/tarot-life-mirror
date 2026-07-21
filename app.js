@@ -56,7 +56,9 @@ const state = {
   selected: [],
   observation: null,
   reflection: '',
-  nextAction: ''
+  nextAction: '',
+  shuffledDeck: [],
+  chosenNumbers: []
 };
 
 const $ = id => document.getElementById(id);
@@ -160,34 +162,36 @@ function clearDeck() {
   deck.innerHTML = '<div class="deck-placeholder">牌会在这里出现</div>';
 }
 
-function createDeck(fanned = false) {
+function createDeck() {
   deck.innerHTML = '';
-  deck.className = `deck-wrap${fanned ? ' fanned' : ''}`;
-  const count = fanned ? 13 : 9;
+  deck.className = `deck-wrap${state.shuffled ? ' ready-stack' : ''}`;
+  const total = TAROT_CARDS.length;
+  const remaining = Math.max(0, total - state.chosenNumbers.length);
+  const count = Math.min(16, Math.max(7, Math.ceil(remaining / 6)));
 
   for (let index = 0; index < count; index++) {
     const card = document.createElement('div');
     const offset = index - (count - 1) / 2;
     card.className = 'deck-card';
-
-    if (fanned) {
-      const transform = `translateX(${offset * 13}px) translateY(${Math.abs(offset) * 2}px) rotate(${offset * 4}deg)`;
-      card.style.transform = transform;
-      card.style.setProperty('--fan-transform', transform);
-      card.style.zIndex = index;
-      card.onclick = () => drawCard(card);
-    } else {
-      card.style.transform = `translate(${index * 1.3}px, ${-index * 0.9}px) rotate(${offset * 0.3}deg)`;
-      card.style.zIndex = index;
-    }
-
+    card.style.transform = `translate(${index * 1.15}px, ${-index * 0.75}px) rotate(${offset * 0.16}deg)`;
+    card.style.zIndex = index;
     deck.appendChild(card);
   }
 
+  const badge = document.createElement('span');
+  badge.className = 'deck-count-badge';
+  badge.textContent = state.shuffled ? `${remaining} / ${total}` : `${total} 张`;
+  deck.appendChild(badge);
+
   const hint = document.createElement('div');
   hint.className = 'deck-hint';
-  hint.textContent = fanned ? '点击一张最先吸引你的牌' : '点击牌堆三次，或按空格键';
+  hint.textContent = state.shuffled
+    ? `牌保持叠放 · 从 1–${total} 中选择编号`
+    : '点击牌堆三次，或按空格键';
   deck.appendChild(hint);
+  deck.setAttribute('aria-label', state.shuffled
+    ? `已洗好的${total}张牌。请在下方输入编号抽牌。`
+    : `共${total}张牌，点击三次洗牌。`);
 }
 
 function shuffleOnce() {
@@ -208,15 +212,74 @@ function shuffleOnce() {
   }
 }
 
+function shuffledCopy(cards) {
+  const result = [...cards];
+  for (let index = result.length - 1; index > 0; index--) {
+    const swapIndex = Math.floor(Math.random() * (index + 1));
+    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
+  }
+  return result;
+}
+
 function finishShuffle() {
   if (state.shuffled) return;
   state.shuffled = true;
-  createDeck(true);
+  state.shuffledDeck = shuffledCopy(TAROT_CARDS);
+  state.chosenNumbers = [];
+  createDeck();
+  promptCardNumber();
+}
+
+function promptCardNumber() {
+  const total = state.shuffledDeck.length;
+  const required = state.spread === 'single' ? 1 : 3;
+  const next = state.chosenNumbers.length + 1;
+  const pickedText = state.chosenNumbers.length
+    ? `\n已选择：${state.chosenNumbers.join('、')}`
+    : '';
+
   setDialogue(
     state.spread === 'single'
-      ? '牌已经展开。请选择一张最先吸引你的牌。'
-      : '牌已经展开。请依次选择三张牌。'
+      ? `牌已经洗好，并保持叠成一摞。\n请凭第一感觉选择 1–${total} 中的一个数字。`
+      : `牌已经洗好，并保持叠成一摞。\n请选择第 ${next}/${required} 个数字（1–${total}），三个数字不能重复。${pickedText}`
   );
+
+  inputWrap.hidden = false;
+  inputWrap.innerHTML = `
+    <div class="number-picker">
+      <label for="cardNumberInput">选择牌堆中的第几张</label>
+      <div class="number-row">
+        <input class="number-input" id="cardNumberInput" type="number" inputmode="numeric" min="1" max="${total}" step="1" placeholder="1–${total}" autocomplete="off">
+        <span class="number-range">/ ${total}</span>
+      </div>
+      <div class="picked-numbers">${state.chosenNumbers.map((value, index) => `<span class="picked-chip">第${index + 1}张：${value}</span>`).join('')}</div>
+    </div>`;
+
+  const submit = () => {
+    const input = $('cardNumberInput');
+    const value = Number(input.value);
+    if (!Number.isInteger(value) || value < 1 || value > total) {
+      showToast(`请输入 1–${total} 的整数`);
+      input.focus();
+      return;
+    }
+    if (state.chosenNumbers.includes(value)) {
+      showToast('这个数字已经选过了');
+      input.select();
+      return;
+    }
+    drawCardByNumber(value);
+  };
+
+  primary(state.spread === 'single' ? '按这个数字抽牌' : `确认第 ${next} 个数字`, submit);
+  const input = $('cardNumberInput');
+  input.addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      submit();
+    }
+  });
+  setTimeout(() => input.focus(), 50);
 }
 
 function makeCard(selection) {
@@ -232,7 +295,7 @@ function makeCard(selection) {
       <div class="card-face card-front">
         <div class="card-art">
           <div class="card-fallback" style="--cardA:${card.colors[0]};--cardB:${card.colors[1]}">
-            <span class="card-number">${String(card.id).padStart(2, '0')} · ${safe(card.en)}</span>
+            <span class="card-number">${safe(card.deckCode || String(card.id).padStart(2, '0'))} · ${safe(card.en)}</span>
             <span class="card-symbol">${safe(card.symbol)}</span>
             <span class="card-name">${safe(card.name)}</span>
           </div>
@@ -252,32 +315,33 @@ function makeCard(selection) {
   return wrapper;
 }
 
-function drawCard(deckCard) {
+function drawCardByNumber(number) {
   if (!state.shuffled || state.step !== 2) return;
-
   const required = state.spread === 'single' ? 1 : 3;
   if (state.selected.length >= required) return;
 
-  const usedIds = new Set(state.selected.map(item => item.card.id));
-  const pool = TAROT_CARDS.filter(card => !usedIds.has(card.id));
-  const card = pool[Math.floor(Math.random() * pool.length)];
-  const orientation = Math.random() < 0.5 ? 'upright' : 'reversed';
-  const selection = { card, orientation };
+  const card = state.shuffledDeck[number - 1];
+  if (!card) {
+    showToast('没有找到这个编号，请重新选择');
+    return;
+  }
 
+  const orientation = Math.random() < 0.5 ? 'upright' : 'reversed';
+  const selection = { card, orientation, deckNumber: number };
   const targetIndex = state.spread === 'single' ? 1 : state.selected.length;
   const slot = document.querySelector(`[data-slot="${targetIndex}"]`);
   slot.querySelector('.empty-label')?.remove();
+  slot.insertBefore(makeCard(selection), slot.firstChild);
 
-  const cardElement = makeCard(selection);
-  slot.insertBefore(cardElement, slot.firstChild);
   state.selected.push(selection);
-
-  deckCard.style.opacity = '.18';
-  deckCard.style.pointerEvents = 'none';
-  showToast(`已选 ${state.selected.length}/${required}`);
+  state.chosenNumbers.push(number);
+  createDeck();
+  showToast(`第 ${number} 张已抽取 · ${state.selected.length}/${required}`);
 
   if (state.selected.length === required) {
-    setTimeout(beginObservation, 450);
+    setTimeout(beginObservation, 500);
+  } else {
+    setTimeout(promptCardNumber, 300);
   }
 }
 
@@ -490,6 +554,43 @@ function getOrientationPatternInsight() {
   return map[pattern];
 }
 
+function getDeckStructureInsights() {
+  const insights = [];
+  const majorCount = state.selected.filter(item => item.card.arcana === 'major').length;
+  const suitLabels = { s: '宝剑', w: '权杖', c: '圣杯', p: '星币' };
+  const suitThemes = {
+    s: '思想、沟通与事实判断',
+    w: '行动、动力与创造方向',
+    c: '感受、关系与直觉回应',
+    p: '现实资源、身体与长期建设'
+  };
+
+  if (state.selected.length === 1) {
+    const card = state.selected[0].card;
+    insights.push(card.arcana === 'major'
+      ? '这是一张大阿尔卡那：问题可能触及较深的价值、身份或人生阶段主题。'
+      : `这是一张${suitLabels[card.suit]}牌：重点更靠近日常中的${suitThemes[card.suit]}。`);
+    return insights;
+  }
+
+  if (majorCount >= 2) {
+    insights.push(`牌阵中有 ${majorCount} 张大阿尔卡那：这件事可能不只是短期事件，也与较深的价值、身份或长期模式有关。`);
+  } else if (majorCount === 0) {
+    insights.push('三张均为小阿尔卡那：重点更靠近日常行为、沟通、情绪和现实资源，适合从具体调整开始。');
+  }
+
+  const suitCounts = new Map();
+  state.selected.forEach(({ card }) => {
+    if (card.suit) suitCounts.set(card.suit, (suitCounts.get(card.suit) || 0) + 1);
+  });
+  const repeatedSuit = [...suitCounts.entries()].sort((a,b) => b[1]-a[1]).find(([,count]) => count >= 2);
+  if (repeatedSuit) {
+    const [suit, count] = repeatedSuit;
+    insights.push(`${count} 张${suitLabels[suit]}重复出现：牌阵特别强调${suitThemes[suit]}。`);
+  }
+  return insights;
+}
+
 function getPairInsights() {
   if (state.selected.length < 2) return [];
 
@@ -506,6 +607,7 @@ function analyzePatterns() {
   const energy = getRepeatedEnergyInsight();
 
   if (orientation) insights.push(orientation);
+  insights.push(...getDeckStructureInsights());
   if (energy) insights.push(energy);
   insights.push(...getPairInsights());
 
@@ -591,7 +693,7 @@ function cardReadingHTML(selection, index, position) {
       </figure>
       <header class="card-reading-header">
         <div>
-          <span class="tiny-label">第${index + 1}张 · ${safe(position.label)} · ${safe(position.role)}</span>
+          <span class="tiny-label">第${index + 1}张 · 选择牌堆编号 ${selection.deckNumber ?? "—"} · ${safe(position.label)} · ${safe(position.role)}</span>
           <h2>${safe(card.name)}${orientationLabel(selection)} · ${safe(card.en)}</h2>
           <p>${safe(card.theme)}</p>
         </div>
@@ -717,7 +819,8 @@ function getCurrentReadingSnapshot() {
       en: item.card.en,
       image: item.card.image,
       orientation: item.orientation,
-      position: positions[index]?.label || '此刻需要看见'
+      position: positions[index]?.label || '此刻需要看见',
+      deckNumber: item.deckNumber ?? null
     })),
     summary: buildOverallSummary(),
     observation: state.observation,
@@ -785,6 +888,8 @@ function setSpread(spread) {
   renderProgress();
   state.shuffleCount = 0;
   state.shuffled = false;
+  state.shuffledDeck = [];
+  state.chosenNumbers = [];
   createDeck();
 
   setDialogue(
@@ -824,7 +929,7 @@ function start() {
   clearDeck();
 
   setDialogue(
-    '欢迎来到这张安静的桌子。\n这个版本不使用大模型，采用22张完整 Rider–Waite–Smith 大阿尔卡那牌面，并通过正逆位、问题类型、牌阵位置和组合规则生成解读。',
+    '欢迎来到这张安静的桌子。\n这个版本不使用大模型，采用完整78张 Rider–Waite–Smith 塔罗牌面，并通过正逆位、问题类型、牌阵位置和组合规则生成解读。',
     [
       { label: '开始', onClick: chooseTopic },
       { label: '先做一次呼吸', onClick: breathe }
@@ -843,7 +948,9 @@ function reset() {
     selected: [],
     observation: null,
     reflection: '',
-    nextAction: ''
+    nextAction: '',
+    shuffledDeck: [],
+    chosenNumbers: []
   });
 
   panel.hidden = true;
@@ -852,11 +959,11 @@ function reset() {
 }
 
 deck.addEventListener('click', () => {
-  if (!deck.classList.contains('fanned')) shuffleOnce();
+  if (!state.shuffled) shuffleOnce();
 });
 
 deck.addEventListener('keydown', event => {
-  if ((event.key === 'Enter' || event.key === ' ') && !deck.classList.contains('fanned')) {
+  if ((event.key === 'Enter' || event.key === ' ') && !state.shuffled) {
     event.preventDefault();
     shuffleOnce();
   }

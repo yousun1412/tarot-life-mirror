@@ -10,7 +10,7 @@
     image.style.setProperty('--viewer-rotation', reversed ? '180deg' : '0deg');
     image.style.setProperty('--viewer-scale', scale);
     title.textContent = `${currentCard.name}${reversed ? '（逆）' : ''}`;
-    subtitle.textContent = `${currentCard.en} · ${reversed ? '逆位' : '正位'} · V12 高清观察`;
+    subtitle.textContent = `${currentCard.en} · ${reversed ? '逆位' : '正位'} · V13 完整牌面观察`;
     const core = reversed ? currentCard.reversedCore : currentCard.uprightCore;
     const advice = reversed ? currentCard.reversedAdvice : currentCard.uprightAdvice;
     meaning.innerHTML = `<strong>${reversed ? '逆位' : '正位'}核心：</strong>${escapeHtml(core || currentCard.theme)}<br><strong>观察提示：</strong>${escapeHtml(advice || currentCard.action)}`;
