@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "生命之镜塔罗",
+  "name": "生命之镜塔罗 V12",
   "short_name": "生命之镜",
-  "description": "不调用大模型、可离线使用的塔罗自我反思应用，内嵌22张完整大阿尔卡那牌面。",
+  "description": "可安装、可离线、无需大模型的塔罗自我反思应用，含完整牌面、牌库、历史记录和分享卡。",
   "lang": "zh-CN",
   "start_url": "./index.html",
   "scope": "./",
@@ -55,6 +55,17 @@
       "name": "查看历史记录",
       "short_name": "历史记录",
       "url": "./index.html?action=history",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "浏览大阿尔卡那牌库",
+      "short_name": "牌库",
+      "url": "./index.html?action=library",
       "icons": [
         {
           "src": "./icons/icon-192.png",
