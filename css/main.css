@@ -1,0 +1,138 @@
+:root{
+  --ink:#f7edd8;--muted:#d6c7ad;--gold:#e9c57c;--gold2:#a87536;
+  --night:#17111c;--panel:rgba(24,16,29,.91);--felt:#253f37;--felt2:#162b27;
+  --line:rgba(232,196,122,.24);--shadow:0 20px 54px rgba(0,0,0,.38)
+}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#100b14;color:var(--ink);font-family:"PingFang SC","Microsoft YaHei",system-ui,-apple-system,sans-serif}button,input,textarea{font:inherit}button{cursor:pointer}.app{width:min(100%,540px);min-height:100dvh;margin:auto;position:relative;overflow:hidden;background:linear-gradient(#211725,#120d16);box-shadow:0 0 70px #0008}.topbar{position:absolute;z-index:50;inset:0 0 auto;display:flex;justify-content:space-between;align-items:center;padding:calc(11px + env(safe-area-inset-top)) 15px 8px;background:linear-gradient(#0b080dcc,transparent)}.brand{border:0;background:none;color:var(--ink);display:flex;gap:9px;align-items:center;text-align:left;padding:0}.brand-mark{width:35px;height:35px;border:1px solid #e9c57cb8;border-radius:50%;display:grid;place-items:center;color:var(--gold)}.brand strong{display:block;letter-spacing:.08em}.brand small{display:block;color:#d6c7ad99;font-size:10px;margin-top:2px}.pill{border:1px solid #ffffff1e;background:#ffffff0d;color:var(--muted);border-radius:999px;padding:8px 12px}.progress{position:absolute;z-index:45;left:16px;right:16px;top:calc(67px + env(safe-area-inset-top));display:grid;grid-template-columns:repeat(6,1fr);gap:5px}.progress-step{height:4px;background:#ffffff1b;border-radius:5px}.progress-step.active,.progress-step.done{background:linear-gradient(90deg,var(--gold2),var(--gold))}.progress-label{position:absolute;right:0;top:9px;font-size:11px;color:#f7edd899}.scene{min-height:100dvh;padding-top:96px;padding-bottom:254px;position:relative}.wood{position:absolute;inset:80px 0 0;background:repeating-linear-gradient(90deg,#ffffff05 0 2px,transparent 2px 55px),linear-gradient(140deg,#77513c,#4c3028 68%,#38211e)}.cloth{position:absolute;left:6%;right:6%;top:80px;bottom:165px;border-radius:32px 32px 78px 78px;background:radial-gradient(circle at 50% 27%,#ffffff0e,transparent 25%),linear-gradient(160deg,var(--felt),var(--felt2));border:1px solid var(--line);box-shadow:0 15px 45px #0005,inset 0 0 90px #0006}.cloth:after{content:"";position:absolute;inset:12px;border:1px solid #e9c57c1a;border-radius:24px 24px 66px 66px}.decor{position:absolute;z-index:4;filter:drop-shadow(0 8px 9px #0006);user-select:none}.candle{left:7%;top:115px;font-size:54px;animation:flicker 2.5s ease-in-out infinite}.crystal{right:7%;top:122px;font-size:45px}.book{left:4%;bottom:230px;font-size:50px;transform:rotate(-14deg)}.tea{right:5%;bottom:235px;font-size:43px;transform:rotate(8deg)}@keyframes flicker{50%{transform:translateY(-2px) scale(1.025);filter:brightness(1.12) drop-shadow(0 0 12px #ffc4625b)}}.table-caption{position:absolute;z-index:6;top:103px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:.2em;color:#f7edd8a8;white-space:nowrap}.spread{position:absolute;z-index:12;top:169px;left:50%;transform:translateX(-50%);width:80%;height:245px;display:flex;align-items:center;justify-content:center;gap:12px}.slot{width:31%;max-width:115px;aspect-ratio:2/3.35;border:1px dashed #e9c57c42;border-radius:12px;display:grid;place-items:center;position:relative;text-align:center;padding:8px;color:#e9c57c70;font-size:11px}.slot:nth-child(1){transform:rotate(-3deg) translateY(10px)}.slot:nth-child(3){transform:rotate(3deg) translateY(10px)}.slot.hidden{display:none}.slot-label{position:absolute;top:calc(100% + 8px);left:50%;transform:translateX(-50%);color:#f7edd89c;white-space:nowrap}.tarot-card{position:absolute;inset:0;border-radius:12px;perspective:1000px;cursor:pointer}.card-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .72s cubic-bezier(.2,.75,.2,1)}.tarot-card.revealed .card-inner{transform:rotateY(180deg)}.card-face{position:absolute;inset:0;border-radius:12px;overflow:hidden;backface-visibility:hidden;border:1px solid #f6dda673;box-shadow:0 14px 26px #0007}.card-back,.deck-card{background:radial-gradient(circle at center,transparent 0 18%,#e8c47a55 18.5% 20%,transparent 20.5%),repeating-conic-gradient(from 0deg,#e8c47a33 0 8deg,transparent 8deg 16deg),linear-gradient(145deg,#34264a,#161020)}.card-back:before{content:"✦";position:absolute;inset:9px;border:1px solid #e9c57c80;border-radius:8px;display:grid;place-items:center;color:var(--gold);font-size:36px}.card-front{transform:rotateY(180deg);display:flex;flex-direction:column;justify-content:space-between;text-align:center;padding:8px;background:radial-gradient(circle at 50% 40%,#ffffff2b,transparent 34%),linear-gradient(180deg,var(--cardA),var(--cardB));color:#fff7e8}.card-number{font-size:9px;letter-spacing:.1em;opacity:.85}.card-symbol{font-size:43px;filter:drop-shadow(0 5px 8px #0005)}.card-name{font-size:13px;font-weight:700;letter-spacing:.08em}.deck-wrap{position:absolute;z-index:16;left:50%;bottom:212px;transform:translateX(-50%);width:285px;height:160px;display:flex;align-items:center;justify-content:center;outline:none}.deck-wrap:focus-visible{filter:drop-shadow(0 0 9px #e9c57c88)}.deck-placeholder,.deck-hint{position:absolute;top:100%;margin-top:8px;font-size:12px;color:#f7edd89b;white-space:nowrap}.deck-card{position:absolute;width:94px;aspect-ratio:2/3.35;border:1px solid #e9c57c8a;border-radius:11px;box-shadow:0 13px 26px #0006;transition:transform .45s ease,opacity .3s,filter .3s}.deck-wrap.fanned .deck-card:hover{filter:brightness(1.16);transform:var(--fan-transform) translateY(-12px)!important}.deck-wrap.shuffling .deck-card:nth-child(odd){animation:shuffleA .48s ease-in-out infinite alternate}.deck-wrap.shuffling .deck-card:nth-child(even){animation:shuffleB .48s ease-in-out infinite alternate}@keyframes shuffleA{to{margin-left:-48px;transform:rotate(-7deg)}}@keyframes shuffleB{to{margin-left:48px;transform:rotate(7deg)}}.hands{position:absolute;z-index:11;left:0;right:0;bottom:160px;height:150px;pointer-events:none}.hand{position:absolute;bottom:-35px;width:42%;height:120px;border-radius:50% 50% 18% 18%;background:linear-gradient(#efc5ad,#c89178);box-shadow:0 14px 30px #0004;opacity:.9}.hand:before{content:"";position:absolute;top:-22px;width:76%;height:58px;border-radius:52% 52% 40% 40%;background:inherit}.hand.left{left:-18%;transform:rotate(18deg)}.hand.left:before{right:0}.hand.right{right:-18%;transform:rotate(-18deg)}.hand.right:before{left:0}.hands.shuffle .hand.left{animation:handL .5s ease-in-out infinite alternate}.hands.shuffle .hand.right{animation:handR .5s ease-in-out infinite alternate}@keyframes handL{to{transform:translate(55px,-24px) rotate(7deg)}}@keyframes handR{to{transform:translate(-55px,-24px) rotate(-7deg)}}.sparkle{position:absolute;z-index:20;left:50%;top:280px;width:150px;height:150px;transform:translate(-50%,-50%);pointer-events:none;opacity:0;background:radial-gradient(circle,#f9de9e55,transparent 61%)}.sparkle.show{animation:sparkle 1s ease}@keyframes sparkle{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}50%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1.4)}}.dialogue{position:absolute;z-index:40;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));min-height:215px;padding:17px 16px 13px;border-radius:24px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(18px)}.dialogue-head{display:flex;align-items:center;gap:10px}.dialogue-head>div:nth-child(2){display:flex;align-items:baseline;justify-content:space-between;flex:1}.dialogue-head small{font-size:11px;color:#f7edd877}.avatar{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(145deg,#6e3d58,#2b2038);border:1px solid #e9c57c5e;color:var(--gold);font-size:20px}.message{min-height:55px;margin-top:10px;font-size:15px;line-height:1.65;color:#f4e9d5;white-space:pre-line}.choices{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}.actions{display:flex;gap:8px;align-items:center;margin-top:11px}.choice,.primary,.ghost{border-radius:999px;padding:9px 14px;border:1px solid #e9c57c47;color:var(--ink);background:#ffffff0e}.primary{margin-left:auto;border:0;background:linear-gradient(135deg,#986639,#ca9854);box-shadow:0 8px 22px #a7773942}.input-wrap{margin-top:11px}.input,.textarea{width:100%;border:1px solid #e9c57c38;border-radius:14px;background:#ffffff0e;color:#fff3dd;padding:12px 13px;outline:none}.textarea{min-height:76px;resize:vertical}.disclaimer{margin:9px 0 0;font-size:10px;color:#f7edd84f;line-height:1.4}.interpretation{position:absolute;z-index:60;left:6%;right:6%;top:112px;max-height:66vh;overflow:auto;padding:20px;border-radius:23px;background:#15101bed;border:1px solid var(--line);box-shadow:var(--shadow);backdrop-filter:blur(18px)}.panel-close{position:absolute;right:12px;top:8px;border:0;background:none;color:#f7edd8bd;font-size:25px}.interpretation h2{margin:2px 0 4px;font-size:23px}.interpretation h3{font-size:13px;color:var(--gold);letter-spacing:.08em;margin:15px 0 7px}.interpretation p,.interpretation li{font-size:13px;line-height:1.7;color:#e9deca}.tiny-label{font-size:11px;color:#e9c57ca8}.interpretation-head>p{margin:0;color:#f7edd89a}.symbol-list{display:flex;flex-wrap:wrap;gap:7px}.symbol-chip{padding:6px 9px;border-radius:10px;background:#e9c57c13;border:1px solid #e9c57c25;font-size:11px;color:#efdbaf}.two-columns{display:grid;grid-template-columns:1fr 1fr;gap:9px}.meaning{padding:11px;border-radius:14px}.meaning h3{margin-top:0}.resource{background:#7aa37a15;border:1px solid #9cc59325}.shadow{background:#b26d7915;border:1px solid #c9899329}.interpretation ul{padding-left:19px}.toast{position:absolute;z-index:100;left:50%;bottom:245px;transform:translateX(-50%) translateY(18px);padding:10px 14px;border-radius:999px;background:#0b080ee8;border:1px solid var(--line);font-size:12px;opacity:0;pointer-events:none;transition:.3s;white-space:nowrap}.toast.show{opacity:1;transform:translateX(-50%)}.about{width:min(90%,460px);border:1px solid var(--line);border-radius:22px;background:#18111e;color:var(--ink);padding:24px;box-shadow:var(--shadow)}.about::backdrop{background:#08060abf;backdrop-filter:blur(5px)}.about h2{margin-top:0}.about p{font-size:14px;line-height:1.75;color:#e7dbc6}@media(max-height:730px){.dialogue{min-height:194px}.scene{padding-bottom:230px}.deck-wrap{bottom:190px}.spread{top:153px;height:220px}.cloth{bottom:145px}.interpretation{max-height:62vh}}@media(max-width:380px){.two-columns{grid-template-columns:1fr}.spread{width:84%;gap:7px}.dialogue{left:8px;right:8px}.message{font-size:14px}}
+
+
+/* v4: upright/reversed reveal and contextual answer */
+.card-front{display:block;padding:0}
+.card-art{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;text-align:center;padding:8px;transition:transform .62s cubic-bezier(.22,.8,.2,1);transform:rotate(0deg);transform-origin:center}
+.tarot-card.turn-reversed .card-art{transform:rotate(180deg)}
+.orientation-tag{position:absolute;z-index:8;right:-10px;top:-25px;padding:4px 7px;border-radius:999px;background:#8a3048e8;border:1px solid #f0b4c2aa;color:#fff5f7;font-size:11px;font-weight:700;letter-spacing:.05em;opacity:0;transform:translateY(7px) scale(.88);transition:opacity .3s ease,transform .35s ease;pointer-events:none;box-shadow:0 7px 18px #0006;white-space:nowrap}
+.tarot-card.turn-reversed .orientation-tag{opacity:1;transform:translateY(0) scale(1)}
+.tarot-card.turn-reversed{filter:drop-shadow(0 0 7px #b8536c66)}
+.answer-block{margin-top:14px;padding:13px 14px;border-radius:15px;background:linear-gradient(135deg,#8d694b28,#4d365f2c);border:1px solid #e9c57c39}
+.answer-block h3{margin-top:0}
+.answer-block p{font-size:14px;font-weight:500;color:#f3e7d2}
+.orientation-meaning{margin-top:10px;padding:12px 14px;border-radius:14px;border:1px solid #9cc5932b;background:#7aa37a15}
+.orientation-meaning.reversed{border-color:#d68a9a3c;background:#a64c6418}
+.orientation-meaning h3{margin-top:0}
+
+
+/* V5：完整牌阵解读 */
+.spread-answer p,.card-reading p{white-space:pre-line}
+.interpretation-list{display:grid;gap:16px;margin-top:16px}
+.card-reading{padding:15px;border-radius:18px;background:#ffffff08;border:1px solid #ffffff12;scroll-margin-top:10px;transition:border-color .3s,box-shadow .3s}
+.card-reading.active{border-color:#e9c57c77;box-shadow:0 0 0 2px #e9c57c16 inset}
+.card-reading-header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-right:4px}
+.card-reading-header h2{font-size:19px;margin:3px 0 4px}
+.card-reading-header p{margin:0;color:#f7edd899}
+.orientation-badge{flex:0 0 auto;border-radius:999px;padding:6px 9px;font-size:11px;border:1px solid #ffffff20}
+.orientation-badge.upright{color:#dff1d7;background:#7aa37a20;border-color:#9cc59335}
+.orientation-badge.reversed{color:#ffd7de;background:#b26d7920;border-color:#c9899340}
+.orientation-meaning{margin-top:13px;padding:11px;border-radius:14px}
+.orientation-meaning.upright{background:#7aa37a13;border:1px solid #9cc59325}
+.orientation-meaning.reversed{background:#b26d7915;border:1px solid #c9899330}
+.orientation-meaning h3{margin-top:0}
+.answer-block{padding:12px;border-radius:14px;background:#e9c57c0e;border:1px solid #e9c57c20}
+.answer-block h3{margin-top:0}
+@media (max-width:420px){.card-reading{padding:13px}.card-reading-header h2{font-size:17px}.orientation-badge{padding:5px 8px}.two-columns{grid-template-columns:1fr}}
+
+/* V6：本地规则解读引擎 */
+.top-actions{display:flex;gap:7px;align-items:center}
+.top-actions .pill{padding:8px 10px}
+.pattern-analysis{margin-top:12px;padding:13px 14px;border-radius:16px;background:#6d5f8b12;border:1px solid #9d8fc52b}
+.pattern-analysis h3{margin-top:0}
+.pattern-analysis ul{margin:0;padding-left:19px}
+.pattern-analysis li+li{margin-top:7px}
+.spread-answer{padding:14px 15px;border-radius:17px;background:linear-gradient(135deg,#8d694b2c,#4d365f2d);border:1px solid #e9c57c3c}
+.spread-answer h3{margin-top:0}
+.spread-answer p{font-size:14px;font-weight:500;color:#f3e7d2}
+.observation-note{padding:12px 13px;border-radius:14px;background:#5d729b17;border:1px solid #88a1cf2c}
+.observation-note h3{margin-top:0}
+.action-note{padding:12px 13px;border-radius:14px;background:#aa7c3b15;border:1px solid #d9a85f2d}
+.action-note h3{margin-top:0}
+.card-reading details{margin-top:11px;padding:10px 12px;border-radius:13px;background:#ffffff08;border:1px solid #ffffff12}
+.card-reading summary{cursor:pointer;color:#efd8aa;font-size:12px;font-weight:700;letter-spacing:.05em}
+.card-reading details[open] summary{margin-bottom:8px}
+.symbol-chip{display:inline-block;line-height:1.45}
+.symbol-chip strong{color:#ffe6b0}
+.history-dialog{max-height:80vh;overflow:auto}
+.history-intro{margin-top:-5px;color:#f7edd879!important}
+.history-list{display:grid;gap:11px}
+.history-item{padding:13px 14px;border-radius:15px;background:#ffffff08;border:1px solid #ffffff12}
+.history-item h3{font-size:14px;margin:5px 0 9px;color:#fff0d5}
+.history-item p{font-size:12px;margin:6px 0!important;line-height:1.6!important}
+.empty-history{padding:18px;border-radius:14px;text-align:center;background:#ffffff08}
+.clear-history{margin-top:14px}
+@media(max-width:420px){
+  .brand small{max-width:145px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .top-actions{gap:4px}
+  .top-actions .pill{font-size:12px;padding:7px 8px}
+  .interpretation{left:4%;right:4%;padding:17px}
+}
+
+
+/* V9：单文件内嵌完整牌面 */
+.card-front{padding:0;background:#18131d}
+.card-art{position:absolute;inset:0;padding:0;display:block;overflow:hidden;transition:transform .72s cubic-bezier(.22,.8,.2,1);transform-origin:center;background:#18131d}
+.tarot-card.turn-reversed .card-art{transform:rotate(180deg)}
+.tarot-image{position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:contain;object-position:center;background:#eee5d3;z-index:2}
+.card-fallback{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;justify-content:space-between;text-align:center;padding:8px;background:radial-gradient(circle at 50% 40%,#ffffff2b,transparent 34%),linear-gradient(180deg,var(--cardA),var(--cardB));color:#fff7e8}
+.card-art.image-error .card-fallback{z-index:3}
+.card-art.image-error:after{content:'内嵌牌图解析失败';position:absolute;z-index:4;left:7px;right:7px;bottom:7px;padding:4px;border-radius:7px;background:#120d16cc;color:#f7edd8;font-size:8px}
+.card-face{background:#17111c}
+.card-front,.card-back{border-radius:10px}
+.reading-card-preview{float:left;width:116px;margin:2px 16px 12px 0;text-align:center}
+.reading-image-frame{position:relative;width:100%;aspect-ratio:350/600;border-radius:11px;overflow:hidden;border:1px solid #f6dda673;box-shadow:0 12px 25px #0007;background:#18131d}
+.reading-card-preview img{position:absolute;inset:0;z-index:2;width:100%;height:100%;object-fit:contain;background:#eee5d3;transition:transform .55s ease;transform-origin:center}
+.reading-card-preview.reversed img{transform:rotate(180deg)}
+.reading-image-fallback{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;justify-content:center;gap:8px;align-items:center;background:linear-gradient(180deg,var(--cardA),var(--cardB));color:#fff7e8;padding:8px}
+.reading-image-fallback span{font-size:38px}
+.reading-card-preview.image-error img{display:none}
+.reading-card-preview figcaption{margin-top:7px;font-size:11px;color:#e8cf9e;line-height:1.4}
+.card-reading-header{min-height:170px}
+.card-reading:after{content:'';display:block;clear:both}
+@media(max-width:420px){
+  .reading-card-preview{width:94px;margin-right:12px}
+  .card-reading-header{min-height:142px}
+}
+
+/* V10：放大桌面翻牌与解读牌面 */
+.spread{top:145px;width:94%;height:290px;gap:9px}
+.slot{flex:1 1 0;width:auto;max-width:132px;padding:6px}
+.spread.single-mode{top:128px;height:330px}
+.spread.single-mode .slot:not(.hidden){flex:0 0 auto;width:clamp(178px,45vw,205px);max-width:205px}
+.spread.single-mode .slot:nth-child(2){transform:none}
+.reading-card-preview{width:142px;margin-right:18px}
+.card-reading-header{min-height:220px}
+@media(max-height:730px){
+  .spread{top:138px;height:250px}
+  .spread.single-mode{top:118px;height:292px}
+}
+@media(max-width:420px){
+  .spread{width:96%;gap:7px}
+  .slot{max-width:122px}
+  .spread.single-mode .slot:not(.hidden){width:clamp(170px,51vw,194px);max-width:194px}
+  .reading-card-preview{width:112px;margin-right:13px}
+  .card-reading-header{min-height:176px}
+}
+@media(max-width:360px){
+  .spread{gap:5px}
+  .slot{max-width:108px}
+  .spread.single-mode .slot:not(.hidden){width:168px;max-width:168px}
+}
+
+
+/* V11：PWA 安装与离线状态 */
+.install-pill{display:none;border-color:#e9c57c55;color:#ffe6b0;background:#e9c57c12}
+.install-pill.ready{display:inline-flex;align-items:center;gap:5px}
+.network-badge{position:absolute;z-index:70;left:50%;top:calc(76px + env(safe-area-inset-top));transform:translateX(-50%) translateY(-8px);padding:6px 11px;border-radius:999px;background:#19111ee8;border:1px solid #e9c57c35;color:#eadabb;font-size:11px;opacity:0;pointer-events:none;transition:.3s}
+.network-badge.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.network-badge.offline{color:#ffd6dc;border-color:#c9899347;background:#351c25ed}
+.install-guide{max-width:min(92vw,430px);border:1px solid #e9c57c33;border-radius:22px;background:#17111cf2;color:#f7edd8;padding:22px;box-shadow:0 24px 70px #0009}
+.install-guide::backdrop{background:#09060bc7;backdrop-filter:blur(5px)}
+.install-guide h2{margin:0 0 10px}.install-guide p,.install-guide li{font-size:14px;line-height:1.65;color:#e9deca}.install-guide ol{padding-left:22px}.install-guide .guide-actions{display:flex;justify-content:flex-end;margin-top:16px}.install-guide .primary{margin-left:0}
+@media(max-width:420px){.top-actions .install-pill{font-size:0;padding:7px 9px}.top-actions .install-pill:before{content:'安装';font-size:12px}}
