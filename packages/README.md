@@ -1,7 +1,8 @@
-# Shared packages
+# 共享核心模块
 
-这些脚本不依赖具体页面，可被 Web、Capacitor、Tauri 和微信小程序复用。
+这些模块不依赖具体页面，可复用于 Web、Capacitor 手机端、Tauri 桌面端和微信小程序。
 
-- `tarot-core`：随机、洗牌、按编号抽牌和牌库校验
-- `platform-core`：存储、分享、触觉等平台能力适配
-- `reading-schema`：阅读记录与个人牌义数据协议
+- `tarot-core`：洗牌、编号抽牌、正逆位和牌库校验。
+- `platform-core`：存储、分享、震动和运行环境适配。
+- `reading-schema`：抽牌记录、学习笔记和周期回顾的数据协议。
+- `analytics-core`：日历映射、牌频、花色、正逆位、牌阵和回顾统计。

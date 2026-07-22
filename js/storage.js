@@ -1,6 +1,6 @@
 (() => {
   const KEY = 'lifeMirrorTarotHistory';
-  const MAX_RECORDS = 100;
+  const MAX_RECORDS = 500;
   const platformStorage = () => window.LifeMirrorPlatform?.storage;
 
   const uid = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
@@ -73,6 +73,7 @@
       reflection: record.reflection || '',
       nextAction: record.nextAction || '',
       followUp: record.followUp || '',
+      review: window.LifeMirrorReadingSchema?.normalizeReview?.(record.review || {}) || (record.review || {}),
       favorite: Boolean(record.favorite)
     };
   }
@@ -122,7 +123,7 @@
   }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify({ version: 20, schemaVersion: 2, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ version: 21, schemaVersion: 3, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;

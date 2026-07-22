@@ -1,4 +1,4 @@
-const VERSION = '20.0.0';
+const VERSION = '21.0.0';
 const CORE_CACHE = `life-mirror-core-v${VERSION}`;
 const RUNTIME_CACHE = `life-mirror-runtime-v${VERSION}`;
 const CACHE_PREFIX = 'life-mirror-';
@@ -8,11 +8,11 @@ const asset = path => new URL(path, self.registration.scope).toString();
 // 避免一次缺图导致整次更新失败，也降低首次安装流量。
 const CORE_SHELL = [
   './', './index.html', './offline.html', './manifest.webmanifest', './version.json',
-  './css/main.css', './css/v14.css', './css/v15.css', './css/v16.css', './css/v17.css', './css/v18.css', './css/v19.css', './css/v20.css',
-  './packages/platform-core/index.js', './packages/tarot-core/index.js', './packages/reading-schema/index.js',
+  './css/main.css', './css/v14.css', './css/v15.css', './css/v16.css', './css/v17.css', './css/v18.css', './css/v19.css', './css/v20.css', './css/v21.css',
+  './packages/platform-core/index.js', './packages/tarot-core/index.js', './packages/reading-schema/index.js', './packages/analytics-core/index.js',
   './data/major-arcana.js', './data/minor-arcana.js', './data/interpretation-v19.js',
   './js/storage.js', './js/learning.js', './js/card-viewer.js', './js/library.js', './js/share.js',
-  './js/history.js', './js/app.js', './js/pwa.js',
+  './js/history.js', './js/insights.js', './js/app.js', './js/pwa.js',
   './icons/icon-192.png', './icons/icon-512.png',
   './icons/icon-maskable-512.png', './icons/apple-touch-icon.png'
 ].map(asset);

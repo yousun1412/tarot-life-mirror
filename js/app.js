@@ -1795,7 +1795,7 @@ function start() {
       { home: true, icon: '☾', label: monthly ? '查看本月运势' : '本月运势', description: '五张或七张月度地图', onClick: beginMonthlyFortune },
       { home: true, icon: '✦', label: '问一件事', description: '围绕具体问题抽牌', onClick: chooseTopic },
       { home: true, icon: '▦', label: '学习塔罗', description: '每日学习、识牌与个人牌义', onClick: () => window.LifeMirrorLearning?.open() },
-      { home: true, icon: '☷', label: '我的记录', description: recordCount ? `${recordCount} 条本地记录` : '回看、收藏与导出', onClick: () => window.LifeMirrorHistory?.open() }
+      { home: true, icon: '☷', label: '我的记录', description: recordCount ? `${recordCount} 条记录 · 日历与统计` : '日历、回顾与统计', onClick: () => window.LifeMirrorInsights?.open() }
     ]
   );
   ghost('先做一次呼吸', breathe);
@@ -1860,7 +1860,7 @@ $('closeInterpretation').onclick = () => panel.hidden = true;
 $('aboutBtn').onclick = () => $('aboutDialog').showModal();
 $('closeAbout').onclick = () => $('aboutDialog').close();
 $('libraryBtn').onclick = () => window.LifeMirrorLibrary?.open();
-$('historyBtn').onclick = () => window.LifeMirrorHistory?.open();
+$('historyBtn').onclick = () => window.LifeMirrorInsights?.open();
 $('aboutPrivacyBtn').onclick = () => { $('aboutDialog').close(); $('privacyDialog').showModal(); };
 $('closePrivacy').onclick = () => $('privacyDialog').close();
 
@@ -1870,11 +1870,12 @@ window.LifeMirrorLibrary?.init();
 window.LifeMirrorLearning?.init();
 window.LifeMirrorShare?.init();
 window.LifeMirrorHistory?.init();
+window.LifeMirrorInsights?.init();
 
 const requestedAction = new URLSearchParams(location.search).get('action');
 start();
 if (requestedAction === 'start') setTimeout(chooseTopic, 200);
-if (requestedAction === 'history') setTimeout(() => window.LifeMirrorHistory?.open(), 200);
+if (requestedAction === 'history' || requestedAction === 'insights') setTimeout(() => window.LifeMirrorInsights?.open(), 200);
 if (requestedAction === 'library') setTimeout(() => window.LifeMirrorLibrary?.open(), 200);
 if (requestedAction === 'learn') setTimeout(() => window.LifeMirrorLearning?.open(), 200);
 if (requestedAction === 'daily') setTimeout(beginDailyFortune, 200);
