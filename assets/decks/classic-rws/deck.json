@@ -1,0 +1,10 @@
+{
+  "id": "classic-rws",
+  "name": "经典韦特",
+  "englishName": "Classic RWS",
+  "version": "1.0.0",
+  "fallbackDeck": null,
+  "format": "webp",
+  "coverage": { "major": 22, "minor": 56 },
+  "paths": { "major": "major/{id2}.webp", "minor": "minor/{code}.webp" }
+}

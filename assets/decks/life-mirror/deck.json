@@ -1,0 +1,13 @@
+{
+  "id": "life-mirror",
+  "name": "生命之镜",
+  "englishName": "Mirror of Life",
+  "version": "1.0.0",
+  "author": "生命之镜塔罗",
+  "license": "private",
+  "fallbackDeck": "classic-rws",
+  "format": "png",
+  "coverage": { "major": 22, "minor": 0 },
+  "paths": { "major": "major/{filename}", "minor": "minor/{code}.png" },
+  "features": { "major": true, "minor": false, "highResolution": true, "reversibleBack": true }
+}

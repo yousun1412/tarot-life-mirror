@@ -1,0 +1,112 @@
+[
+  {
+    "id": 0,
+    "name": "愚者",
+    "en": "THE FOOL"
+  },
+  {
+    "id": 1,
+    "name": "魔术师",
+    "en": "THE MAGICIAN"
+  },
+  {
+    "id": 2,
+    "name": "女祭司",
+    "en": "THE HIGH PRIESTESS"
+  },
+  {
+    "id": 3,
+    "name": "皇后",
+    "en": "THE EMPRESS"
+  },
+  {
+    "id": 4,
+    "name": "皇帝",
+    "en": "THE EMPEROR"
+  },
+  {
+    "id": 5,
+    "name": "教皇",
+    "en": "THE HIEROPHANT"
+  },
+  {
+    "id": 6,
+    "name": "恋人",
+    "en": "THE LOVERS"
+  },
+  {
+    "id": 7,
+    "name": "战车",
+    "en": "THE CHARIOT"
+  },
+  {
+    "id": 8,
+    "name": "力量",
+    "en": "STRENGTH"
+  },
+  {
+    "id": 9,
+    "name": "隐士",
+    "en": "THE HERMIT"
+  },
+  {
+    "id": 10,
+    "name": "命运之轮",
+    "en": "WHEEL OF FORTUNE"
+  },
+  {
+    "id": 11,
+    "name": "正义",
+    "en": "JUSTICE"
+  },
+  {
+    "id": 12,
+    "name": "倒吊人",
+    "en": "THE HANGED MAN"
+  },
+  {
+    "id": 13,
+    "name": "死神",
+    "en": "DEATH"
+  },
+  {
+    "id": 14,
+    "name": "节制",
+    "en": "TEMPERANCE"
+  },
+  {
+    "id": 15,
+    "name": "恶魔",
+    "en": "THE DEVIL"
+  },
+  {
+    "id": 16,
+    "name": "高塔",
+    "en": "THE TOWER"
+  },
+  {
+    "id": 17,
+    "name": "星星",
+    "en": "THE STAR"
+  },
+  {
+    "id": 18,
+    "name": "月亮",
+    "en": "THE MOON"
+  },
+  {
+    "id": 19,
+    "name": "太阳",
+    "en": "THE SUN"
+  },
+  {
+    "id": 20,
+    "name": "审判",
+    "en": "JUDGEMENT"
+  },
+  {
+    "id": 21,
+    "name": "世界",
+    "en": "THE WORLD"
+  }
+]
