@@ -22,6 +22,9 @@
       dailyMode: record.dailyMode || '',
       weeklyMode: record.weeklyMode || '',
       monthlyMode: record.monthlyMode || '',
+      choiceA: record.choiceA || '',
+      choiceB: record.choiceB || '',
+      recommendation: record.recommendation || null,
       topicKey: record.topicKey || '',
       topic: record.topic || '未分类',
       question: record.question || '未记录问题',
@@ -46,6 +49,14 @@
                     ? ['本月整体主题','学习与工作','关系与互动','现实生活与资源','本月行动建议'][index]
                     : record.spread === 'monthly-seven'
                       ? ['月初状态','月中变化','月末趋势','学习与工作','关系与互动','主要挑战','可使用的力量'][index]
+                  : record.spread === 'obstacle-four'
+                    ? ['表面问题','深层阻力','已有资源','下一步行动'][index]
+                    : record.spread === 'relationship-five'
+                      ? ['我的状态','对方表现出的状态','共同模式','主要阻力','我可以采取的行动'][index]
+                      : record.spread === 'choice-six'
+                        ? ['当前核心',`选择A · ${record.choiceA || 'A'}`,`A的代价 · ${record.choiceA || 'A'}`,`选择B · ${record.choiceB || 'B'}`,`B的代价 · ${record.choiceB || 'B'}`,'真正的判断标准'][index]
+                        : record.spread === 'celtic-ten'
+                          ? ['当前核心','交叉影响','意识目标','深层根基','过去影响','近期发展','自我位置','环境影响','希望与担忧','综合趋势'][index]
                   : record.spread === 'three'
                     ? ['当前状态','需要看见','可以行动'][index]
                     : record.spread === 'daily-single' ? '今日主题' : '此刻需要看见'
@@ -108,7 +119,7 @@
   }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify({ version: 18, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ version: 19, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;

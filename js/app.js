@@ -175,7 +175,32 @@ const POSITION_RULES = {
     label: '可使用的力量',
     role: '资源',
     prompt: '这张牌指出本月已经存在、可以主动调用的能力与支持。'
-  }
+  },
+  obstacleSurface: { label: '表面问题', role: '现状', prompt: '这张牌描述当前最容易被看见的表层表现。' },
+  obstacleDeep: { label: '深层阻力', role: '阻力', prompt: '这张牌指出让问题反复或难以前进的深层阻力。' },
+  obstacleResource: { label: '已有资源', role: '资源', prompt: '这张牌指出你已经拥有、但可能尚未充分使用的资源。' },
+  obstacleAction: { label: '下一步行动', role: '行动', prompt: '这张牌帮助你形成一个可以立即验证的小行动。' },
+  relationshipSelf: { label: '我的状态', role: '现状', prompt: '这张牌描述你在关系中可观察到的状态、需要和反应。' },
+  relationshipOther: { label: '对方表现出的状态', role: '现状', prompt: '这张牌只观察对方已经表现出的行为和互动，不推断未表达的内心。' },
+  relationshipPattern: { label: '共同模式', role: '核心视角', prompt: '这张牌指出双方互动中反复出现的共同结构。' },
+  relationshipObstacle: { label: '主要阻力', role: '阻力', prompt: '这张牌指出关系目前最需要管理的沟通、边界或现实阻力。' },
+  relationshipAction: { label: '我可以采取的行动', role: '行动', prompt: '这张牌把注意力放回你能够决定和执行的行动。' },
+  choiceCore: { label: '当前核心', role: '核心视角', prompt: '这张牌指出两个选择背后真正需要解决的核心问题。' },
+  choiceAFlow: { label: '选择A的发展', role: '趋势', prompt: '这张牌描述在当前条件下选择A较可能展开的方向。' },
+  choiceACost: { label: '选择A的代价', role: '代价', prompt: '这张牌指出选择A需要投入、放下或承担的现实代价。' },
+  choiceBFlow: { label: '选择B的发展', role: '趋势', prompt: '这张牌描述在当前条件下选择B较可能展开的方向。' },
+  choiceBCost: { label: '选择B的代价', role: '代价', prompt: '这张牌指出选择B需要投入、放下或承担的现实代价。' },
+  choiceStandard: { label: '真正的判断标准', role: '判断', prompt: '这张牌帮助你确定比较两个选择时最重要的标准。' },
+  celticCore: { label: '当前核心', role: '核心视角', prompt: '这张牌描述复杂问题此刻最核心的能量。' },
+  celticCross: { label: '交叉影响', role: '影响', prompt: '这张牌指出正在帮助、阻挡或改变核心问题的力量。' },
+  celticGoal: { label: '意识目标', role: '趋势', prompt: '这张牌呈现你目前正在追求、设想或试图实现的方向。' },
+  celticRoot: { label: '深层根基', role: '根基', prompt: '这张牌指出问题形成的深层基础与旧模式。' },
+  celticPast: { label: '过去影响', role: '影响', prompt: '这张牌描述仍在影响当前局面的过去经验或条件。' },
+  celticNear: { label: '近期发展', role: '趋势', prompt: '这张牌描述在当前条件延续时较接近的阶段性发展。' },
+  celticSelf: { label: '自我位置', role: '现状', prompt: '这张牌描述你如何看待自己，以及你正在采取的姿态。' },
+  celticEnvironment: { label: '环境影响', role: '环境', prompt: '这张牌观察周围人的表现、现实条件与外部支持。' },
+  celticHope: { label: '希望与担忧', role: '希望与担忧', prompt: '这张牌呈现期待与恐惧如何共同影响判断。' },
+  celticOutcome: { label: '综合趋势', role: '趋势', prompt: '这张牌描述在现有条件延续时的综合趋势，而不是固定结局。' }
 };
 
 const state = {
@@ -197,7 +222,10 @@ const state = {
   weekKey: '',
   monthKey: '',
   periodLabel: '',
-  recordId: ''
+  recordId: '',
+  choiceA: '',
+  choiceB: '',
+  recommendation: null
 };
 
 const $ = id => document.getElementById(id);
@@ -388,6 +416,20 @@ function getPositions() {
     POSITION_RULES.monthlyChallenge,
     POSITION_RULES.monthlyResource
   ];
+  if (state.spread === 'obstacle-four') return [POSITION_RULES.obstacleSurface, POSITION_RULES.obstacleDeep, POSITION_RULES.obstacleResource, POSITION_RULES.obstacleAction];
+  if (state.spread === 'relationship-five') return [POSITION_RULES.relationshipSelf, POSITION_RULES.relationshipOther, POSITION_RULES.relationshipPattern, POSITION_RULES.relationshipObstacle, POSITION_RULES.relationshipAction];
+  if (state.spread === 'choice-six') return [
+    POSITION_RULES.choiceCore,
+    { ...POSITION_RULES.choiceAFlow, label: state.choiceA ? `选择A · ${state.choiceA}` : POSITION_RULES.choiceAFlow.label },
+    { ...POSITION_RULES.choiceACost, label: state.choiceA ? `A的代价 · ${state.choiceA}` : POSITION_RULES.choiceACost.label },
+    { ...POSITION_RULES.choiceBFlow, label: state.choiceB ? `选择B · ${state.choiceB}` : POSITION_RULES.choiceBFlow.label },
+    { ...POSITION_RULES.choiceBCost, label: state.choiceB ? `B的代价 · ${state.choiceB}` : POSITION_RULES.choiceBCost.label },
+    POSITION_RULES.choiceStandard
+  ];
+  if (state.spread === 'celtic-ten') return [
+    POSITION_RULES.celticCore, POSITION_RULES.celticCross, POSITION_RULES.celticGoal, POSITION_RULES.celticRoot, POSITION_RULES.celticPast,
+    POSITION_RULES.celticNear, POSITION_RULES.celticSelf, POSITION_RULES.celticEnvironment, POSITION_RULES.celticHope, POSITION_RULES.celticOutcome
+  ];
   return state.spread === 'single'
     ? [POSITION_RULES.single]
     : [POSITION_RULES.current, POSITION_RULES.awareness, POSITION_RULES.action];
@@ -403,8 +445,12 @@ function renderSlots() {
   const spread = $('spread');
   spread.classList.toggle('single-mode', single);
   spread.classList.toggle('three-mode', positions.length === 3);
+  spread.classList.toggle('four-mode', positions.length === 4);
   spread.classList.toggle('five-mode', positions.length === 5);
+  spread.classList.toggle('six-mode', positions.length === 6);
   spread.classList.toggle('seven-mode', positions.length === 7);
+  spread.classList.toggle('ten-mode', positions.length === 10);
+  spread.classList.toggle('celtic-mode', state.spread === 'celtic-ten');
   spread.innerHTML = positions.map((position, index) => `
     <div class="slot" data-slot="${index}">
       <span class="empty-label">${safe(position.label)}</span>
@@ -811,8 +857,8 @@ function getOrientationData(selection) {
 }
 
 function buildCardAnswer(selection, position) {
-  if (window.LifeMirrorV18) {
-    return window.LifeMirrorV18.cardAnswer(selection, position, state.topic, state.question, isBinaryQuestion());
+  if (window.LifeMirrorV19) {
+    return window.LifeMirrorV19.cardAnswer(selection, position, state.topic, state.question, isBinaryQuestion());
   }
   const { card, orientation } = selection;
   const data = getOrientationData(selection);
@@ -841,8 +887,8 @@ function buildCardAnswer(selection, position) {
 }
 
 function positionSpecificText(selection, position) {
-  if (window.LifeMirrorV18) {
-    return window.LifeMirrorV18.positionText(selection.card, state.topic, selection.orientation, position.role);
+  if (window.LifeMirrorV19) {
+    return window.LifeMirrorV19.positionText(selection.card, state.topic, selection.orientation, position.role);
   }
   const { card, orientation } = selection;
   const data = getOrientationData(selection);
@@ -912,10 +958,11 @@ function getOrientationPatternInsight() {
   }
 
   const reversed = state.selected.filter(item => item.orientation === 'reversed').length;
-  if (reversed === 0) return `${state.selected.length}张牌均为正位：本周主题较容易显现，重点在安排优先级并落实行动。`;
-  if (reversed === state.selected.length) return `${state.selected.length}张牌均为逆位：本周更适合整理阻力、修正节奏和补足条件，不宜把所有问题都推向外部。`;
-  if (reversed > state.selected.length / 2) return `${reversed}张逆位占多数：本周的主要工作是调整内部失衡、信息缺口和执行节奏。`;
-  return `正逆位分布较均衡：本周既有可直接使用的力量，也有需要逐项修正的部分。`;
+  const scope = isDailyReading() ? '今天' : isWeeklyReading() ? '本周' : isMonthlyReading() ? '本月' : '这组牌';
+  if (reversed === 0) return `${state.selected.length}张牌均为正位：${scope}的主题较容易显现，重点在安排优先级并落实行动。`;
+  if (reversed === state.selected.length) return `${state.selected.length}张牌均为逆位：${scope}更适合整理阻力、修正节奏和补足条件，不宜把所有问题都推向外部。`;
+  if (reversed > state.selected.length / 2) return `${reversed}张逆位占多数：${scope}的主要工作是调整内部失衡、信息缺口和执行节奏。`;
+  return `正逆位分布较均衡：${scope}既有可直接使用的力量，也有需要逐项修正的部分。`;
 }
 
 function getDeckStructureInsights() {
@@ -974,7 +1021,7 @@ function analyzePatterns() {
   insights.push(...getDeckStructureInsights());
   if (energy) insights.push(energy);
   insights.push(...getPairInsights());
-  if (window.LifeMirrorV18) insights.push(...window.LifeMirrorV18.extraPatterns(state.selected));
+  if (window.LifeMirrorV19) insights.push(...window.LifeMirrorV19.extraPatterns(state.selected));
 
   if (state.observation) {
     const selection = state.selected[state.observation.cardIndex];
@@ -989,7 +1036,7 @@ function analyzePatterns() {
 function buildSingleSummary() {
   const selection = state.selected[0];
   const position = getPositions()[0];
-  if (window.LifeMirrorV18) return window.LifeMirrorV18.buildSingleSummary({ selection, position, topic: state.topic, question: state.question, binary: isBinaryQuestion() });
+  if (window.LifeMirrorV19) return window.LifeMirrorV19.buildSingleSummary({ selection, position, topic: state.topic, question: state.question, binary: isBinaryQuestion() });
   return [
     `关于“${state.question}”，${selection.card.name}${orientationLabel(selection)}没有给出一个固定预言，而是把注意力放在“${selection.card.theme}”上。`,
     buildCardAnswer(selection, position),
@@ -1000,7 +1047,7 @@ function buildSingleSummary() {
 function buildThreeCardSummary() {
   const positions = getPositions();
   const topic = TOPICS[state.topic];
-  if (window.LifeMirrorV18) return window.LifeMirrorV18.buildThreeSummary({ selected: state.selected, positions, topic: state.topic, question: state.question, binary: isBinaryQuestion(), topicNote: topic.note });
+  if (window.LifeMirrorV19) return window.LifeMirrorV19.buildThreeSummary({ selected: state.selected, positions, topic: state.topic, question: state.question, binary: isBinaryQuestion(), topicNote: topic.note });
 
   const intro = `关于“${state.question}”，三张牌形成“${positions.map(position => position.label).join('—')}”的发展路径。`;
   const lines = state.selected.map((selection, index) => `${positions[index].label}｜${selection.card.name}${orientationLabel(selection)}：${getOrientationData(selection).core}`);
@@ -1011,8 +1058,8 @@ function buildOverallSummary() {
   if (state.selected.length === 1) return buildSingleSummary();
   if (state.selected.length === 3) return buildThreeCardSummary();
   const positions = getPositions();
-  if (window.LifeMirrorV18?.buildMultiSummary) {
-    return window.LifeMirrorV18.buildMultiSummary({ selected: state.selected, positions, topic: state.topic, question: state.question, topicNote: TOPICS[state.topic]?.note || '' });
+  if (window.LifeMirrorV19?.buildMultiSummary) {
+    return window.LifeMirrorV19.buildMultiSummary({ selected: state.selected, positions, topic: state.topic, question: state.question, topicNote: TOPICS[state.topic]?.note || '', spread: state.spread });
   }
   return [
     `关于“${state.question}”，这组牌形成一张由${state.selected.length}个位置组成的观察地图。`,
@@ -1071,7 +1118,7 @@ function cardReadingHTML(selection, index, position) {
 
       <section class="topic-meaning-v15">
         <h3>结合“${safe(TOPICS[state.topic].label)}”的${orientationText}解读</h3>
-        <p>${safe(window.LifeMirrorV18?.topicText(card, state.topic, orientation) || card.topics[state.topic] || card.theme)}</p>
+        <p>${safe(window.LifeMirrorV19?.topicText(card, state.topic, orientation) || card.topics[state.topic] || card.theme)}</p>
       </section>
 
       <section class="orientation-meaning ${orientation}">
@@ -1166,7 +1213,7 @@ function showFullInterpretation(focusIndex = 0) {
   const insights = analyzePatterns();
   const periodic = isPeriodicReading();
   const modeLabel = positions.length === 1 ? '单牌规则解读' : `${positions.length}张牌规则解读`;
-  $('interpretSpreadLabel').innerHTML = `<span class="interpretation-engine-badge">✦ V18 月度与分层解读</span><br>${modeLabel}`;
+  $('interpretSpreadLabel').innerHTML = `<span class="interpretation-engine-badge">✦ V19 智能牌阵解读</span><br>${modeLabel}`;
   $('interpretTitle').textContent = isDailyReading()
     ? '本日运势解读'
     : isWeeklyReading()
@@ -1187,7 +1234,7 @@ function showFullInterpretation(focusIndex = 0) {
 
   $('patternList').innerHTML = insights.map(item => `<li>${safe(item)}</li>`).join('');
 
-  const narrativeLinks = window.LifeMirrorV18?.narrativeLinks(state.selected, positions, state.topic) || [];
+  const narrativeLinks = window.LifeMirrorV19?.narrativeLinks(state.selected, positions, state.topic) || [];
   const narrativeSection = $('narrativeSection');
   if (narrativeSection) narrativeSection.hidden = !narrativeLinks.length;
   if ($('narrativeList')) $('narrativeList').innerHTML = narrativeLinks.slice(0, 8).map(item => `<li>${safe(item)}</li>`).join('');
@@ -1283,6 +1330,9 @@ function getCurrentReadingSnapshot() {
     dailyMode: isDailyReading() ? (isSingleSpread() ? 'single' : 'three') : '',
     weeklyMode: isWeeklyReading() ? (state.spread === 'weekly-seven' ? 'seven' : 'three') : '',
     monthlyMode: isMonthlyReading() ? (state.spread === 'monthly-seven' ? 'seven' : 'five') : '',
+    choiceA: state.choiceA || '',
+    choiceB: state.choiceB || '',
+    recommendation: state.recommendation || null,
     topicKey: state.topic,
     topic: TOPICS[state.topic]?.label || '自我反思',
     question: state.question,
@@ -1354,6 +1404,9 @@ function chooseTopic() {
   state.monthKey = '';
   state.periodLabel = '';
   state.recordId = '';
+  state.choiceA = '';
+  state.choiceB = '';
+  state.recommendation = null;
   state.step = 1;
   renderProgress();
 
@@ -1383,15 +1436,82 @@ function setTopic(topicKey) {
   );
 }
 
-function chooseSpread() {
-  setDialogue(
-    `你的问题是：\n“${state.question}”\n\n请选择抽牌方式。`,
-    [
-      { label: '一张牌 · 聚焦当下', onClick: () => setSpread('single') },
-      { label: '三张牌 · 状态/看见/行动', onClick: () => setSpread('three') }
-    ]
-  );
+const QUESTION_SPREADS = {
+  single: { label: '一张牌 · 快速看核心', count: 1, description: '适合聚焦此刻最值得看见的一点' },
+  three: { label: '三张牌 · 现状/看见/行动', count: 3, description: '适合梳理问题的发展路径' },
+  'obstacle-four': { label: '四张牌 · 阻力与资源', count: 4, description: '表面问题、深层阻力、已有资源、下一步行动' },
+  'relationship-five': { label: '五张牌 · 关系模式', count: 5, description: '双方表现、共同模式、阻力与可采取行动' },
+  'choice-six': { label: '六张牌 · 两个选择', count: 6, description: '比较A/B的发展、代价与真正判断标准' },
+  'celtic-ten': { label: '十张牌 · 凯尔特十字', count: 10, description: '从根基、过去、环境到综合趋势的深度地图' }
+};
+
+function recommendQuestionSpread() {
+  const question = state.question.toLowerCase();
+  if (/(复杂|全貌|深入|长期|多方面|凯尔特|整体梳理)/.test(question)) {
+    return { spread: 'celtic-ten', reason: '你的问题涉及多个层面，适合用十张牌同时观察根基、影响、环境与发展。' };
+  }
+  if (state.topic === 'decision' || /(还是|选择|比较|两条路|a和b|a还是b|要不要)/i.test(question)) {
+    return { spread: 'choice-six', reason: '问题包含两个方向或现实决策，适合在相同标准下比较发展与代价。' };
+  }
+  if (state.topic === 'relationship' || /(关系|对方|我们|沟通|边界|相处)/.test(question)) {
+    return { spread: 'relationship-five', reason: '问题重点在互动与边界，适合观察双方表现、共同模式和你能采取的行动。' };
+  }
+  if (/(卡住|阻力|障碍|突破|资源|原因|为什么|根源)/.test(question)) {
+    return { spread: 'obstacle-four', reason: '问题聚焦难以前进的原因，适合区分表面问题、深层阻力和已有资源。' };
+  }
+  if (question.length <= 16 || /(最需要|核心|重点|一句|此刻)/.test(question)) {
+    return { spread: 'single', reason: '问题较聚焦，一张牌足以提供清晰的核心观察角度。' };
+  }
+  return { spread: 'three', reason: '问题需要同时看见现状、容易忽略的部分和下一步行动，三张牌的信息量较合适。' };
 }
+
+function showSpreadRecommendation() {
+  state.recommendation = recommendQuestionSpread();
+  const meta = QUESTION_SPREADS[state.recommendation.spread];
+  setDialogue(`你的问题是：
+“${state.question}”
+
+系统建议：${meta.label}
+${state.recommendation.reason}`);
+  const card = document.createElement('div');
+  card.className = 'spread-recommendation';
+  card.innerHTML = `<span>推荐牌阵</span><strong>${safe(meta.label)}</strong><p>${safe(meta.description)}</p><small>${safe(state.recommendation.reason)}</small>`;
+  inputWrap.hidden = false;
+  inputWrap.innerHTML = '';
+  inputWrap.appendChild(card);
+  ghost('查看其他牌阵', showAllQuestionSpreads);
+  primary('使用推荐牌阵', () => prepareQuestionSpread(state.recommendation.spread));
+}
+
+function showAllQuestionSpreads() {
+  setDialogue('选择适合这次问题的牌阵。牌越多不代表越准确，只代表观察角度更多。',
+    Object.entries(QUESTION_SPREADS).map(([spread, meta]) => ({
+      label: `${meta.label}`,
+      onClick: () => prepareQuestionSpread(spread)
+    }))
+  );
+  ghost('返回推荐', showSpreadRecommendation);
+}
+
+function prepareQuestionSpread(spread) {
+  if (spread !== 'choice-six') {
+    state.choiceA = '';
+    state.choiceB = '';
+    setSpread(spread);
+    return;
+  }
+  setDialogue('先为两个选择各写一个简短名称，后面的牌阵位置会直接显示它们。');
+  showInput('text', '选择A，例如：接受新工作', state.choiceA, value => {
+    state.choiceA = value;
+    setDialogue('现在写下选择B。');
+    showInput('text', '选择B，例如：留在目前岗位', state.choiceB, second => {
+      state.choiceB = second;
+      setSpread('choice-six');
+    });
+  });
+}
+
+function chooseSpread() { showSpreadRecommendation(); }
 
 function setSpread(spread) {
   state.spread = spread;
@@ -1463,6 +1583,9 @@ function restoreSavedReading(record) {
     weekKey: record.weekKey || (readingType === 'weekly' ? getLocalWeekInfo().key : ''),
     monthKey: record.monthKey || (readingType === 'monthly' ? getLocalMonthInfo().key : ''),
     periodLabel: record.periodLabel || (readingType === 'weekly' ? getLocalWeekInfo().label : readingType === 'monthly' ? getLocalMonthInfo().label : ''),
+    choiceA: record.choiceA || '',
+    choiceB: record.choiceB || '',
+    recommendation: record.recommendation || null,
     recordId: record.id || (readingType === 'weekly' ? `weekly-${getLocalWeekInfo().key}` : readingType === 'monthly' ? `monthly-${getLocalMonthInfo().key}` : `daily-${localDayKey()}`)
   });
 
@@ -1716,7 +1839,10 @@ function reset() {
     weekKey: '',
     monthKey: '',
     periodLabel: '',
-    recordId: ''
+    recordId: '',
+    choiceA: '',
+    choiceB: '',
+    recommendation: null
   });
 
   panel.hidden = true;
@@ -1764,6 +1890,7 @@ window.LifeMirrorHistory?.init();
 
 const requestedAction = new URLSearchParams(location.search).get('action');
 start();
+if (requestedAction === 'start') setTimeout(chooseTopic, 200);
 if (requestedAction === 'history') setTimeout(() => window.LifeMirrorHistory?.open(), 200);
 if (requestedAction === 'library') setTimeout(() => window.LifeMirrorLibrary?.open(), 200);
 if (requestedAction === 'daily') setTimeout(beginDailyFortune, 200);

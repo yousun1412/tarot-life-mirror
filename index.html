@@ -5,7 +5,7 @@
 <meta content="width=device-width, initial-scale=1, viewport-fit=cover" name="viewport"/>
 <meta content="#17111c" name="theme-color"/>
 <meta content="可安装、可离线的完整78张塔罗应用，支持问事抽牌、本日、本周与本月运势，并提供分层解读。" name="description"/>
-<meta content="v18-monthly-layered" name="tarot-build"/>
+<meta content="v19-smart-spreads" name="tarot-build"/>
 <meta content="生命之镜塔罗" name="application-name"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
@@ -14,16 +14,16 @@
 <link href="./manifest.webmanifest" rel="manifest"/>
 <link href="./icons/icon-192.png" rel="icon" sizes="192x192" type="image/png"/>
 <link href="./icons/apple-touch-icon.png" rel="apple-touch-icon"/>
-<title>生命之镜塔罗 V18 · 本月运势</title>
+<title>生命之镜塔罗 V19 · 智能牌阵</title>
 
-<link href="./css/main.css" rel="stylesheet"/><link href="./css/v14.css" rel="stylesheet"/><link href="./css/v15.css" rel="stylesheet"/><link href="./css/v16.css" rel="stylesheet"/><link href="./css/v17.css" rel="stylesheet"/><link href="./css/v18.css" rel="stylesheet"/></head>
+<link href="./css/main.css" rel="stylesheet"/><link href="./css/v14.css" rel="stylesheet"/><link href="./css/v15.css" rel="stylesheet"/><link href="./css/v16.css" rel="stylesheet"/><link href="./css/v17.css" rel="stylesheet"/><link href="./css/v18.css" rel="stylesheet"/><link href="./css/v19.css" rel="stylesheet"/></head>
 <body>
 <main class="app" id="app">
 <div aria-live="polite" class="network-badge" id="networkBadge" role="status"></div>
 <header class="topbar">
 <button aria-label="查看说明" class="brand" id="aboutBtn">
 <span class="brand-mark">✦</span>
-<span><strong>生命之镜塔罗</strong><small>V18 · 月度与分层解读</small></span>
+<span><strong>生命之镜塔罗</strong><small>V19 · 智能推荐与深度牌阵</small></span>
 </button>
 <div class="top-actions">
 <button class="pill install-pill" id="installBtn" type="button">⇩ 安装应用</button>
@@ -108,12 +108,12 @@
 <dialog class="about" id="aboutDialog">
 <button aria-label="关闭说明" class="panel-close" id="closeAbout">×</button>
 <h2>关于本地规则版</h2>
-<p>V18 使用完整78张塔罗牌，提供问事抽牌、本日、本周与本月运势。本月运势支持五张简洁牌阵与七张完整牌阵，解读可在“30秒看懂、完整解读、深入探索”之间切换。</p>
+<p>V19 使用完整78张塔罗牌。问事流程会根据问题推荐单牌、三牌、阻力资源、关系、选择或凯尔特十字牌阵，同时保留本日、本周与本月运势和三层解读。</p>
 <p>牌面采用书中展示的完整 Rider–Waite–Smith 78张扫描图，并全部打包在网站目录中：大阿尔卡那内嵌，小阿尔卡那存放在本地 assets/cards 文件夹，不依赖外部图床。</p>
-<p>每张牌包含画面线索、象征、资源面、阴影面、正逆位核心解释、八类主题视角和行动建议。三牌模式还会分析逆位分布、共同能量与牌间发展。</p>
+<p>每张牌包含画面线索、象征、资源面、阴影面、正逆位核心解释、八类主题视角和行动建议。多牌模式会结合位置、正逆位、花色、数字和牌间发展生成解读。</p>
 <p>内容采用“观察画面—理解象征—结合问题—辨认力量与阴影—形成行动”的方法整理，是用于产品原型的原创摘要与规则化改写，并非书籍逐字翻译。</p>
 <p>逆位不等于坏结果，也不一定是正位的完全相反；它可能表示能量受阻、内化、过度、不足或需要调整。</p>
-<div class="about-links"><button class="ghost" id="aboutPrivacyBtn" type="button">隐私与免责声明</button><span class="version-chip">版本 18.0.0</span></div></dialog>
+<div class="about-links"><button class="ghost" id="aboutPrivacyBtn" type="button">隐私与免责声明</button><span class="version-chip">版本 19.0.0</span></div></dialog>
 <dialog class="dialog-wide" id="historyDialog">
 <header class="dialog-header"><div><h2>本地记录</h2><p class="dialog-subtitle">可搜索、收藏、补充后续、导出和恢复。数据只保存在当前设备。</p></div><button aria-label="关闭" class="dialog-close" id="closeHistory">×</button></header>
 <div class="history-toolbar"><input id="historySearch" placeholder="搜索问题、牌名或反思" type="search"/><select id="historyTopicFilter"><option value="">全部主题</option><option>关系</option><option>学习与工作</option><option>个人成长</option><option>情绪状态</option><option>一个具体决定</option><option>本日运势</option><option>本周运势</option><option>本月运势</option></select></div>
@@ -128,11 +128,11 @@
 <div class="viewer-shell"><header class="viewer-head"><div class="viewer-title"><strong id="viewerCardTitle">牌面</strong><small id="viewerCardSubtitle"></small></div><button aria-label="关闭牌面" class="dialog-close" id="closeCardViewer">×</button></header>
 <div class="viewer-stage"><img alt="完整塔罗牌面" class="viewer-image" id="viewerImage"/></div>
 <footer class="viewer-foot"><div class="viewer-controls"><button id="viewerZoomOut" type="button">－</button><input aria-label="牌面缩放" class="viewer-range" id="viewerZoom" max="240" min="65" type="range" value="100"/><button id="viewerZoomIn" type="button">＋</button><button id="viewerReset" type="button">复原</button><button id="viewerOrientation" type="button">切换逆位</button></div><div class="viewer-meaning" id="viewerMeaning"></div></footer></div>
-</dialog><dialog class="dialog-wide" id="libraryDialog"><header class="dialog-header"><div><h2>完整塔罗牌库</h2><p class="dialog-subtitle">浏览78张完整牌面，可筛选大阿尔卡那与四种花色，点击牌面进入放大观察。</p></div><button aria-label="关闭牌库" class="dialog-close" id="closeLibrary">×</button></header><div class="library-tools"><input id="librarySearch" placeholder="搜索牌名、英文名或主题" type="search"/><select id="libraryArcana"><option value="">全部牌组</option><option value="major">大阿尔卡那</option><option value="s">宝剑</option><option value="w">权杖</option><option value="c">圣杯</option><option value="p">星币</option></select><select id="libraryEnergy"><option value="">全部主题</option></select></div><p class="library-count" id="libraryCount"></p><div class="library-grid" id="libraryGrid"></div></dialog><dialog class="dialog-wide" id="shareDialog"><header class="dialog-header"><div><h2>生成分享卡</h2><p class="dialog-subtitle">图片在当前设备生成，不会上传问题和牌阵。</p></div><button aria-label="关闭分享" class="dialog-close" id="closeShare">×</button></header><div class="share-body"><div class="share-canvas-wrap"><canvas height="1350" id="shareCanvas" width="1080"></canvas></div><div class="share-settings"><label><input id="shareIncludeQuestion" type="checkbox"/> 在图片中显示完整问题</label><button class="primary" id="shareDownload" type="button">保存图片</button><button id="shareNative" type="button">使用系统分享</button><p class="share-status" id="shareStatus"></p></div></div></dialog><dialog class="dialog-wide" id="privacyDialog"><header class="dialog-header"><div><h2>隐私与免责声明</h2><p class="dialog-subtitle">V18 的数据处理方式与使用边界。</p></div><button aria-label="关闭" class="dialog-close" id="closePrivacy">×</button></header><div class="privacy-sections"><section class="privacy-section"><h3>数据保存在本地</h3><p>本应用不要求注册，也不调用大模型。问题、抽牌、反思和后续记录存放在当前浏览器的本地存储中。清除浏览器数据或卸载应用可能会删除记录，请使用导出功能备份。</p></section><section class="privacy-section"><h3>分享由你决定</h3><p>分享图片在设备内生成，默认不显示完整问题。只有你主动下载或调用系统分享时，图片才会离开本应用。</p></section><section class="privacy-section"><h3>使用边界</h3><p>内容用于塔罗文化学习、娱乐和自我反思，不预测确定未来，也不替代医疗、心理、法律、财务或其他专业意见。关系解读不声称知道第三方未表达的真实想法。</p></section><section class="privacy-section"><h3>牌面与内容</h3><p>牌面为完整 Rider–Waite–Smith 78张扫描图。牌义是根据图像象征、资源与阴影、正逆位、问题类型和牌阵位置整理的原创摘要与规则化改写。</p></section></div></dialog><div class="update-banner" id="updateBanner" role="status" data-state="ready" aria-live="polite">
+</dialog><dialog class="dialog-wide" id="libraryDialog"><header class="dialog-header"><div><h2>完整塔罗牌库</h2><p class="dialog-subtitle">浏览78张完整牌面，可筛选大阿尔卡那与四种花色，点击牌面进入放大观察。</p></div><button aria-label="关闭牌库" class="dialog-close" id="closeLibrary">×</button></header><div class="library-tools"><input id="librarySearch" placeholder="搜索牌名、英文名或主题" type="search"/><select id="libraryArcana"><option value="">全部牌组</option><option value="major">大阿尔卡那</option><option value="s">宝剑</option><option value="w">权杖</option><option value="c">圣杯</option><option value="p">星币</option></select><select id="libraryEnergy"><option value="">全部主题</option></select></div><p class="library-count" id="libraryCount"></p><div class="library-grid" id="libraryGrid"></div></dialog><dialog class="dialog-wide" id="shareDialog"><header class="dialog-header"><div><h2>生成分享卡</h2><p class="dialog-subtitle">图片在当前设备生成，不会上传问题和牌阵。</p></div><button aria-label="关闭分享" class="dialog-close" id="closeShare">×</button></header><div class="share-body"><div class="share-canvas-wrap"><canvas height="1350" id="shareCanvas" width="1080"></canvas></div><div class="share-settings"><label><input id="shareIncludeQuestion" type="checkbox"/> 在图片中显示完整问题</label><button class="primary" id="shareDownload" type="button">保存图片</button><button id="shareNative" type="button">使用系统分享</button><p class="share-status" id="shareStatus"></p></div></div></dialog><dialog class="dialog-wide" id="privacyDialog"><header class="dialog-header"><div><h2>隐私与免责声明</h2><p class="dialog-subtitle">V19 的数据处理方式与使用边界。</p></div><button aria-label="关闭" class="dialog-close" id="closePrivacy">×</button></header><div class="privacy-sections"><section class="privacy-section"><h3>数据保存在本地</h3><p>本应用不要求注册，也不调用大模型。问题、抽牌、反思和后续记录存放在当前浏览器的本地存储中。清除浏览器数据或卸载应用可能会删除记录，请使用导出功能备份。</p></section><section class="privacy-section"><h3>分享由你决定</h3><p>分享图片在设备内生成，默认不显示完整问题。只有你主动下载或调用系统分享时，图片才会离开本应用。</p></section><section class="privacy-section"><h3>使用边界</h3><p>内容用于塔罗文化学习、娱乐和自我反思，不预测确定未来，也不替代医疗、心理、法律、财务或其他专业意见。关系解读不声称知道第三方未表达的真实想法。</p></section><section class="privacy-section"><h3>牌面与内容</h3><p>牌面为完整 Rider–Waite–Smith 78张扫描图。牌义是根据图像象征、资源与阴影、正逆位、问题类型和牌阵位置整理的原创摘要与规则化改写。</p></section></div></dialog><div class="update-banner" id="updateBanner" role="status" data-state="ready" aria-live="polite">
   <div class="update-copy">
     <strong id="updateTitle">发现新版本</strong>
     <p id="updateStatus">更新后将保留当前设备上的本地记录。</p>
-    <div class="update-versions"><span id="currentVersion">当前 18.0.0</span><b>→</b><span id="latestVersion">最新 —</span></div>
+    <div class="update-versions"><span id="currentVersion">当前 19.0.0</span><b>→</b><span id="latestVersion">最新 —</span></div>
     <div class="update-progress" aria-hidden="true"><span></span></div>
   </div>
   <div class="update-actions">
@@ -143,5 +143,5 @@
 
 
 
-<script defer="" src="./data/major-arcana.js"></script><script defer="" src="./data/minor-arcana.js"></script><script defer="" src="./data/interpretation-v18.js"></script><script defer="" src="./js/storage.js"></script><script defer="" src="./js/card-viewer.js"></script><script defer="" src="./js/library.js"></script><script defer="" src="./js/share.js"></script><script defer="" src="./js/history.js"></script><script defer="" src="./js/app.js"></script><script defer="" src="./js/pwa.js"></script></body>
+<script defer="" src="./data/major-arcana.js"></script><script defer="" src="./data/minor-arcana.js"></script><script defer="" src="./data/interpretation-v19.js"></script><script defer="" src="./js/storage.js"></script><script defer="" src="./js/card-viewer.js"></script><script defer="" src="./js/library.js"></script><script defer="" src="./js/share.js"></script><script defer="" src="./js/history.js"></script><script defer="" src="./js/app.js"></script><script defer="" src="./js/pwa.js"></script></body>
 </html>

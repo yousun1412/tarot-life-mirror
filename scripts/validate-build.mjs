@@ -12,7 +12,7 @@ const read = relative => fs.readFileSync(path.join(root, relative), 'utf8');
 
 const required = [
   'index.html', 'offline.html', 'manifest.webmanifest', 'version.json', 'service-worker.js',
-  'css/main.css', 'css/v14.css', 'css/v15.css', 'css/v16.css', 'css/v17.css', 'css/v18.css', 'data/major-arcana.js', 'data/minor-arcana.js', 'data/interpretation-v18.js',
+  'css/main.css', 'css/v14.css', 'css/v15.css', 'css/v16.css', 'css/v17.css', 'css/v18.css', 'css/v19.css', 'data/major-arcana.js', 'data/minor-arcana.js', 'data/interpretation-v19.js',
   'js/app.js', 'js/pwa.js', 'js/storage.js', 'js/card-viewer.js', 'js/library.js',
   'js/share.js', 'js/history.js', 'icons/icon-192.png', 'icons/icon-512.png',
   'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'
@@ -80,7 +80,7 @@ for (const ref of shellRefs) {
   if (ref === './') continue;
   if (!exists(ref)) fail(`Service Worker核心文件不存在：${ref}`);
 }
-if (shellRefs.some(ref => ref.includes('assets/cards'))) fail('V17不应在安装阶段预缓存全部牌图');
+if (shellRefs.some(ref => ref.includes('assets/cards'))) fail('V19不应在安装阶段预缓存全部牌图');
 ok('Service Worker核心缓存清单检查完成');
 
 try {
@@ -108,42 +108,47 @@ for (const file of jsFiles) {
 ok('JavaScript语法检查完成');
 
 
-// V18 additional checks
-for (const relativePath of ['css/v18.css','data/interpretation-v18.js']) {
-  if (!exists(relativePath)) fail(`缺少 V18 文件：${relativePath}`);
+// V19 additional checks
+for (const relativePath of ['css/v19.css','data/interpretation-v19.js']) {
+  if (!exists(relativePath)) fail(`缺少 V19 文件：${relativePath}`);
 }
-const v18EngineText = read('data/interpretation-v18.js');
-for (const marker of ['TOPIC_GUIDES','POSITION_BUILDERS','getNarrativeLinks','daily','weekly','monthly','18.0.0','buildMultiSummary']) {
-  if (!v18EngineText.includes(marker)) fail(`V18 引擎缺少标记：${marker}`);
+const v19EngineText = read('data/interpretation-v19.js');
+for (const marker of ['TOPIC_GUIDES','POSITION_BUILDERS','getNarrativeLinks','daily','weekly','monthly','19.0.0','buildMultiSummary','代价','判断','根基']) {
+  if (!v19EngineText.includes(marker)) fail(`V19 引擎缺少标记：${marker}`);
 }
 try {
   const context = vm.createContext({ window: {}, console });
   vm.runInContext(read('data/major-arcana.js'), context, { filename: 'major-arcana.js' });
   vm.runInContext(read('data/minor-arcana.js'), context, { filename: 'minor-arcana.js' });
-  vm.runInContext(read('data/interpretation-v18.js'), context, { filename: 'interpretation-v18.js' });
+  vm.runInContext(read('data/interpretation-v19.js'), context, { filename: 'interpretation-v19.js' });
   const enriched = context.window.LIFE_MIRROR_DATA.cards;
   let topicCount = 0;
   for (const card of enriched) {
     for (const topic of ['relationship','work','growth','emotion','decision','daily','weekly','monthly']) {
       for (const orientation of ['upright','reversed']) {
-        const text = context.window.LifeMirrorV18.topicText(card, topic, orientation);
-        if (!text || text.length < 30) fail(`V18主题解释异常：${card.name}/${topic}/${orientation}`);
+        const text = context.window.LifeMirrorV19.topicText(card, topic, orientation);
+        if (!text || text.length < 30) fail(`V19主题解释异常：${card.name}/${topic}/${orientation}`);
         topicCount += 1;
       }
     }
   }
-  if (topicCount !== 1248) fail(`V18主题解释应为1248条，实际为${topicCount}`);
-  else ok('V18 1248条正逆位主题解释检查通过');
+  if (topicCount !== 1248) fail(`V19主题解释应为1248条，实际为${topicCount}`);
+  else ok('V19 1248条正逆位主题解释检查通过');
 } catch (error) {
-  fail(`V18引擎执行失败：${error.stack || error.message}`);
+  fail(`V19引擎执行失败：${error.stack || error.message}`);
 }
 
 const appText = read('js/app.js');
-for (const marker of ['beginDailyFortune','beginWeeklyFortune','beginMonthlyFortune','monthly-five','monthly-seven','如上，如下；如内，如外。']) {
-  if (!appText.includes(marker)) fail(`V18周期运势流程缺少标记：${marker}`);
+for (const marker of ['beginDailyFortune','beginWeeklyFortune','beginMonthlyFortune','monthly-five','monthly-seven','recommendQuestionSpread','obstacle-four','relationship-five','choice-six','celtic-ten','如上，如下；如内，如外。']) {
+  if (!appText.includes(marker)) fail(`V19流程缺少标记：${marker}`);
 }
-if (!appText.includes("getPositions().length")) fail('V18抽牌数量未改为动态牌阵长度');
-for (const marker of ['data-interpretation-layer="overview"','data-interpretation-layer="full"','data-interpretation-layer="deep"','本月运势']) { if (!html.includes(marker)) fail(`V18页面缺少标记：${marker}`); }
+if (!appText.includes("getPositions().length")) fail('V19抽牌数量未改为动态牌阵长度');
+for (const marker of ['data-interpretation-layer="overview"','data-interpretation-layer="full"','data-interpretation-layer="deep"','本月运势','V19']) { if (!html.includes(marker)) fail(`V19页面缺少标记：${marker}`); }
+
+
+for (const marker of ['spread.four-mode','spread.six-mode','spread.ten-mode.celtic-mode']) { if (!read('css/v19.css').includes(marker)) fail(`V19布局缺少标记：${marker}`); }
+for (const spread of ['obstacle-four','relationship-five','choice-six','celtic-ten']) { if (!appText.includes(spread)) fail(`V19缺少牌阵：${spread}`); }
+if (!read('js/share.js').includes('cards.length === 10')) fail('V19分享卡未适配十张牌');
 
 if (errors.length) {
   console.error('\n构建校验失败：');
@@ -151,4 +156,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`\nV18构建校验通过：${cards.length || 78}张牌，${cardImages.length}张本地小阿尔卡那牌图。`);
+console.log(`\nV19构建校验通过：${cards.length || 78}张牌，${cardImages.length}张本地小阿尔卡那牌图。`);
