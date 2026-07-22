@@ -14,6 +14,8 @@
     return {
       schemaVersion: window.LifeMirrorReadingSchema?.version || 2,
       platform: record.platform || window.LifeMirrorPlatform?.runtime || 'web',
+      deckId: record.deckId || 'classic-rws',
+      deckVersion: record.deckVersion || window.LifeMirrorDecks?.registry?.[record.deckId || 'classic-rws']?.version || '1.0.0',
       id: record.id || uid(),
       timestamp,
       date: record.date || new Date(timestamp).toLocaleString(),
@@ -35,11 +37,15 @@
       drawMode: record.drawMode === 'fate' ? 'fate' : 'manual',
       cards: Array.isArray(record.cards) ? record.cards.map((item, index) => {
         const card = resolveCard(item);
+        const requestedDeckId = item.deckId || record.deckId || 'classic-rws';
+        const resolvedCard = window.LifeMirrorDecks?.resolveCard(card, requestedDeckId, item.resolvedDeckId || '') || card;
         return {
           id: card?.id ?? item.id ?? null,
           name: card?.name || item.name || '未知牌',
           en: card?.en || item.en || '',
-          image: card?.image || item.image || '',
+          image: resolvedCard?.image || item.image || '',
+          deckId: requestedDeckId,
+          resolvedDeckId: item.resolvedDeckId || resolvedCard?.resolvedDeckId || 'classic-rws',
           orientation: item.orientation === 'reversed' ? 'reversed' : 'upright',
           position: item.position || (
             record.spread === 'daily-three'
@@ -123,7 +129,7 @@
   }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify({ version: 21, schemaVersion: 3, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ version: 22, schemaVersion: 4, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;

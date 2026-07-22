@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "生命之镜塔罗 V21",
+  "name": "生命之镜塔罗 V22",
   "short_name": "生命之镜",
-  "description": "完整78张塔罗应用，支持智能牌阵、日周月运势、学习塔罗、记录日历、周期回顾和个人统计。",
+  "description": "完整78张多牌组塔罗应用，支持生命之镜艺术牌面、自动回退、智能牌阵、日周月运势、学习、回顾和个人统计。",
   "lang": "zh-CN",
   "start_url": "./index.html",
   "scope": "./",
@@ -110,6 +110,17 @@
       "name": "学习塔罗",
       "short_name": "学习塔罗",
       "url": "./index.html?action=learn",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "选择牌面风格",
+      "short_name": "牌面风格",
+      "url": "./index.html?action=decks",
       "icons": [
         {
           "src": "./icons/icon-192.png",

@@ -81,5 +81,5 @@
     };
   }
 
-  window.LifeMirrorAnalytics = Object.freeze({ version: '21.0.0', dayKey, countBy, calendarMap, summarize });
+  window.LifeMirrorAnalytics = Object.freeze({ version: '22.0.0', dayKey, countBy, calendarMap, summarize });
 })();

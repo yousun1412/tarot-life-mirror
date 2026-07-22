@@ -46,7 +46,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。新的事实、想法或判断正在出现，适合命名问题并直接面对核心。",
       "decision": "面对具体决定，把问题写成一句可验证的陈述，并确认最关键的事实。同时留意：把“正确”变成攻击，或只凭一个念头就下最终结论。"
     },
-    "image": "./assets/cards/s01.webp"
+    "image": "./assets/decks/classic-rws/minor/s01.webp"
   },
   {
     "id": 23,
@@ -94,7 +94,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。当前存在两种力量或选择，暂时停下可以保护自己并等待更多信息。",
       "decision": "面对具体决定，列出两个选择的真实代价，再规定一个重新评估的时间。同时留意：用冷静掩盖恐惧，长期冻结选择。"
     },
-    "image": "./assets/cards/s02.webp"
+    "image": "./assets/decks/classic-rws/minor/s02.webp"
   },
   {
     "id": 24,
@@ -142,7 +142,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。承认失望、悲伤或关系中的刺痛，是开始修复的前提。",
       "decision": "面对具体决定，允许自己准确说出受伤之处，并寻找安全支持。同时留意：把痛苦当作永久身份，或用受伤合理化攻击。"
     },
-    "image": "./assets/cards/s03.webp"
+    "image": "./assets/decks/classic-rws/minor/s03.webp"
   },
   {
     "id": 25,
@@ -190,7 +190,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。身体和头脑需要暂停、睡眠、独处或恢复，暂时不行动也是有效选择。",
       "decision": "面对具体决定，主动安排一段不处理问题的恢复时间。同时留意：把休息误认为失败，或无限期躲开需要面对的事。"
     },
-    "image": "./assets/cards/s04.webp"
+    "image": "./assets/decks/classic-rws/minor/s04.webp"
   },
   {
     "id": 26,
@@ -238,7 +238,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。需要看清冲突中的权力、策略和代价；赢得争论不一定等于解决问题。",
       "decision": "面对具体决定，先问“我真正想保护什么”，再决定是否继续这场争斗。同时留意：为赢而赢、以伤害换取短期优势，或默认自己只能失败。"
     },
-    "image": "./assets/cards/s05.webp"
+    "image": "./assets/decks/classic-rws/minor/s05.webp"
   },
   {
     "id": 27,
@@ -286,7 +286,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。正在从困难环境或旧思路转向较平稳的阶段，过程可能缓慢但方向有效。",
       "decision": "面对具体决定，确认你正在离开什么，也确认必须带走哪些经验。同时留意：把离开当作彻底遗忘，或因不舍而不断返回消耗。"
     },
-    "image": "./assets/cards/s06.webp"
+    "image": "./assets/decks/classic-rws/minor/s06.webp"
   },
   {
     "id": 28,
@@ -334,7 +334,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。需要使用策略、保护信息或独立行动，但必须检查方法是否符合长期价值。",
       "decision": "面对具体决定，把计划写清楚，检查哪些内容需要保密、哪些必须坦诚。同时留意：把聪明变成投机，或因不信任而孤立自己。"
     },
-    "image": "./assets/cards/s07.webp"
+    "image": "./assets/decks/classic-rws/minor/s07.webp"
   },
   {
     "id": 29,
@@ -382,7 +382,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。限制感是真实的，但其中有一部分来自信念、恐惧或尚未尝试的选择。",
       "decision": "面对具体决定，找出一个仍能控制的小变量，并采取最低风险的动作。同时留意：把暂时困难解释成“永远无法改变”。"
     },
-    "image": "./assets/cards/s08.webp"
+    "image": "./assets/decks/classic-rws/minor/s08.webp"
   },
   {
     "id": 30,
@@ -430,7 +430,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。焦虑和内疚需要被认真照料，夜间放大的念头不等于完整事实。",
       "decision": "面对具体决定，把担忧写下并区分“已发生、可能发生、只是害怕”。同时留意：把每个念头都当成预言，或因羞耻拒绝支持。"
     },
-    "image": "./assets/cards/s09.webp"
+    "image": "./assets/decks/classic-rws/minor/s09.webp"
   },
   {
     "id": 31,
@@ -478,7 +478,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。一个模式、计划或阶段已经走到尽头，承认结束才能停止继续消耗。",
       "decision": "面对具体决定，停止给失效方案继续投入，先完成止损和收尾。同时留意：绝望化、夸大失败，或在终点继续伤害自己。"
     },
-    "image": "./assets/cards/s10.webp"
+    "image": "./assets/decks/classic-rws/minor/s10.webp"
   },
   {
     "id": 32,
@@ -526,7 +526,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。新的信息、问题或学习动力出现，适合观察、提问和练习清楚表达。",
       "decision": "面对具体决定，提出一个具体问题，并从可靠来源核实。同时留意：把敏锐变成挑刺、监视或无休止的怀疑。"
     },
-    "image": "./assets/cards/s11.webp"
+    "image": "./assets/decks/classic-rws/minor/s11.webp"
   },
   {
     "id": 33,
@@ -574,7 +574,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。行动和表达非常迅速，适合突破拖延、捍卫观点或处理紧急情况。",
       "decision": "面对具体决定，明确唯一目标，快速行动时保留一次检查点。同时留意：把速度当成正确，把强硬当成力量。"
     },
-    "image": "./assets/cards/s12.webp"
+    "image": "./assets/decks/classic-rws/minor/s12.webp"
   },
   {
     "id": 34,
@@ -622,7 +622,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。以经验和理性看清局面，能够直接沟通并建立公平边界。",
       "decision": "面对具体决定，用简洁语言说出事实、需要和边界。同时留意：因过去伤痛而先行拒绝、讽刺或过度审判。"
     },
-    "image": "./assets/cards/s13.webp"
+    "image": "./assets/decks/classic-rws/minor/s13.webp"
   },
   {
     "id": 35,
@@ -670,7 +670,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。以原则、证据和长期责任作决定，适合处理规则、制度和复杂判断。",
       "decision": "面对具体决定，建立判断标准，并说明决定依据。同时留意：把个人偏见包装成绝对规则。"
     },
-    "image": "./assets/cards/s14.webp"
+    "image": "./assets/decks/classic-rws/minor/s14.webp"
   },
   {
     "id": 36,
@@ -718,7 +718,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。新的热情、创意或行动冲动出现，适合开始尝试并让能量进入现实。",
       "decision": "面对具体决定，在24小时内完成一个可见的启动动作。同时留意：把兴奋误认为长期承诺，或因害怕失败压抑冲动。"
     },
-    "image": "./assets/cards/w01.webp"
+    "image": "./assets/decks/classic-rws/minor/w01.webp"
   },
   {
     "id": 37,
@@ -766,7 +766,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。已有一定基础，现在需要比较路径、扩大视野并决定下一阶段方向。",
       "decision": "面对具体决定，选定一个方向并列出前30天的验证计划。同时留意：被安全感困住，或只想控制未来而不行动。"
     },
-    "image": "./assets/cards/w02.webp"
+    "image": "./assets/decks/classic-rws/minor/w02.webp"
   },
   {
     "id": 38,
@@ -813,7 +813,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。已经采取的行动开始产生外部回响，适合拓展合作、耐心等待并继续布局。",
       "decision": "面对具体决定，检查已经发出的行动，并主动跟进一个外部连接。同时留意：过度承诺、期待外界自动带来结果。"
     },
-    "image": "./assets/cards/w03.webp"
+    "image": "./assets/decks/classic-rws/minor/w03.webp"
   },
   {
     "id": 39,
@@ -861,7 +861,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。阶段性成果值得庆祝，稳定关系、团队或空间能够支持下一步成长。",
       "decision": "面对具体决定，确认一个阶段性成果，并与支持你的人共享。同时留意：只维持表面喜庆，忽略归属中的排斥或压力。"
     },
-    "image": "./assets/cards/w04.webp"
+    "image": "./assets/decks/classic-rws/minor/w04.webp"
   },
   {
     "id": 40,
@@ -908,7 +908,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。不同意见和能量相遇，健康竞争可以暴露问题并激发成长。",
       "decision": "面对具体决定，先定义共同目标和争论规则，再处理分歧。同时留意：把每个差异都视为威胁，或为了和平假装没有冲突。"
     },
-    "image": "./assets/cards/w05.webp"
+    "image": "./assets/decks/classic-rws/minor/w05.webp"
   },
   {
     "id": 41,
@@ -955,7 +955,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。努力获得认可、进展或阶段性胜利，适合接受支持并承担可见度。",
       "decision": "面对具体决定，明确成果并感谢协作者，不把认可当成唯一价值。同时留意：把掌声等同于自我价值，或为了形象掩盖问题。"
     },
-    "image": "./assets/cards/w06.webp"
+    "image": "./assets/decks/classic-rws/minor/w06.webp"
   },
   {
     "id": 42,
@@ -1003,7 +1003,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。需要保护边界、立场或已有成果，挑战并不意味着你处于弱势。",
       "decision": "面对具体决定，明确一条最重要的底线，并集中力量守住它。同时留意：把所有不同意见都当成攻击，或在疲惫时继续硬撑。"
     },
-    "image": "./assets/cards/w07.webp"
+    "image": "./assets/decks/classic-rws/minor/w07.webp"
   },
   {
     "id": 43,
@@ -1050,7 +1050,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。事情快速推进、消息到来或延迟解除，适合保持专注并及时响应。",
       "decision": "面对具体决定，确定优先顺序，快速完成最关键的沟通。同时留意：因速度兴奋而忽略方向、细节和承受能力。"
     },
-    "image": "./assets/cards/w08.webp"
+    "image": "./assets/decks/classic-rws/minor/w08.webp"
   },
   {
     "id": 44,
@@ -1098,7 +1098,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。经历多次考验后仍有韧性，适合保护成果并用经验完成最后阶段。",
       "decision": "面对具体决定，保留体力，只守最关键的边界。同时留意：把警觉变成永久戒备，无法再信任任何支持。"
     },
-    "image": "./assets/cards/w09.webp"
+    "image": "./assets/decks/classic-rws/minor/w09.webp"
   },
   {
     "id": 45,
@@ -1146,7 +1146,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。承担很多责任并接近完成，但需要重新分配重量和优先级。",
       "decision": "面对具体决定，列出可以委托、推迟或停止的三项负担。同时留意：把自我价值绑定在“什么都能扛”，看不见替代方案。"
     },
-    "image": "./assets/cards/w10.webp"
+    "image": "./assets/decks/classic-rws/minor/w10.webp"
   },
   {
     "id": 46,
@@ -1194,7 +1194,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。新的兴趣、消息或冒险冲动出现，适合学习、实验和表达热情。",
       "decision": "面对具体决定，做一个小型实验，并记录你真正感到兴奋的部分。同时留意：只追求刺激、不完成，或用玩笑回避承诺。"
     },
-    "image": "./assets/cards/w11.webp"
+    "image": "./assets/decks/classic-rws/minor/w11.webp"
   },
   {
     "id": 47,
@@ -1241,7 +1241,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。热情推动快速行动、旅行或大胆追求，适合突破停滞。",
       "decision": "面对具体决定，给冒险设定边界、期限和完成标准。同时留意：把激情当成可靠性，忽略他人的节奏与现实限制。"
     },
-    "image": "./assets/cards/w12.webp"
+    "image": "./assets/decks/classic-rws/minor/w12.webp"
   },
   {
     "id": 48,
@@ -1289,7 +1289,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。自信、吸引力和创造力自然流动，适合鼓励他人并忠于自己的热情。",
       "decision": "面对具体决定，以真实热情行动，不必通过比较证明自己。同时留意：把魅力用于控制，或因害怕不被喜欢而缩小自己。"
     },
-    "image": "./assets/cards/w13.webp"
+    "image": "./assets/decks/classic-rws/minor/w13.webp"
   },
   {
     "id": 49,
@@ -1337,7 +1337,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。能够看见大方向、激励行动并承担领导责任，适合推进长期愿景。",
       "decision": "面对具体决定，把愿景翻译成清楚目标、责任和节奏。同时留意：把个人意志当作所有人的共同方向。"
     },
-    "image": "./assets/cards/w14.webp"
+    "image": "./assets/decks/classic-rws/minor/w14.webp"
   },
   {
     "id": 50,
@@ -1384,7 +1384,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。新的情感、爱意、直觉或创造感正在流入，适合开放接收并表达真诚。",
       "decision": "面对具体决定，用一个具体动作表达关心，也为自己保留接收的空间。同时留意：情绪泛滥、依赖外界填满自己，或彻底关闭感受。"
     },
-    "image": "./assets/cards/c01.webp"
+    "image": "./assets/decks/classic-rws/minor/c01.webp"
   },
   {
     "id": 51,
@@ -1432,7 +1432,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。双方出现互相回应、合作或情感连接，重点是平等、坦诚和共同选择。",
       "decision": "面对具体决定，确认双方实际做出的回应，并清楚表达期待。同时留意：把吸引误认为承诺，或因害怕失去而放弃自己。"
     },
-    "image": "./assets/cards/c02.webp"
+    "image": "./assets/decks/classic-rws/minor/c02.webp"
   },
   {
     "id": 52,
@@ -1480,7 +1480,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。友情、团队支持和共同庆祝带来滋养，适合分享成果并接受群体连接。",
       "decision": "面对具体决定，主动联系能让你感到安全和真实的人。同时留意：把归属建立在迎合、比较或持续娱乐上。"
     },
-    "image": "./assets/cards/c03.webp"
+    "image": "./assets/decks/classic-rws/minor/c03.webp"
   },
   {
     "id": 53,
@@ -1528,7 +1528,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。对现有选择感到疲惫或不满足，暂停可以帮助辨认真正需要。",
       "decision": "面对具体决定，先描述不满足的具体来源，再重新看一眼被忽略的选项。同时留意：把保护变成封闭，对所有可能都提前拒绝。"
     },
-    "image": "./assets/cards/c04.webp"
+    "image": "./assets/decks/classic-rws/minor/c04.webp"
   },
   {
     "id": 54,
@@ -1576,7 +1576,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。失落需要被哀悼，但并非所有资源都已经消失；仍有连接和回归路径。",
       "decision": "面对具体决定，为失去留出时间，同时列出仍可依靠的两项支持。同时留意：让遗憾定义全部未来，忽略可用支持。"
     },
-    "image": "./assets/cards/c05.webp"
+    "image": "./assets/decks/classic-rws/minor/c05.webp"
   },
   {
     "id": 55,
@@ -1624,7 +1624,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。过去的记忆、旧关系或单纯善意重新出现，可以带来安慰和理解。",
       "decision": "面对具体决定，从回忆中提取真实资源，而不是复制整个过去。同时留意：用怀旧逃避现在，或让旧角色决定当前关系。"
     },
-    "image": "./assets/cards/c06.webp"
+    "image": "./assets/decks/classic-rws/minor/c06.webp"
   },
   {
     "id": 56,
@@ -1672,7 +1672,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。可能性和想象很多，适合探索愿望，但必须区分幻想、恐惧与现实选项。",
       "decision": "面对具体决定，为每个选项写下证据、代价和第一步。同时留意：把想象当成承诺，或因可能太多而完全不选。"
     },
-    "image": "./assets/cards/c07.webp"
+    "image": "./assets/decks/classic-rws/minor/c07.webp"
   },
   {
     "id": 57,
@@ -1720,7 +1720,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。即使已经投入许多，也可能需要离开无法满足深层需要的局面。",
       "decision": "面对具体决定，清楚写下离开的原因和要寻找的价值。同时留意：把离开当作唯一解决方式，或因沉没成本无限停留。"
     },
-    "image": "./assets/cards/c08.webp"
+    "image": "./assets/decks/classic-rws/minor/c08.webp"
   },
   {
     "id": 58,
@@ -1767,7 +1767,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。愿望实现、情绪满足或个人成果值得享受，适合承认自己的需要和收获。",
       "decision": "面对具体决定，具体说出你已经拥有的满足，并保持感恩与节制。同时留意：把满足变成占有、炫耀或短期刺激。"
     },
-    "image": "./assets/cards/c09.webp"
+    "image": "./assets/decks/classic-rws/minor/c09.webp"
   },
   {
     "id": 59,
@@ -1815,7 +1815,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。共同价值、家庭支持或长期情感愿景正在形成，适合建设可持续的归属。",
       "decision": "面对具体决定，把“幸福”翻译成双方可执行的日常行为。同时留意：用理想模板压迫真实的人和关系。"
     },
-    "image": "./assets/cards/c10.webp"
+    "image": "./assets/decks/classic-rws/minor/c10.webp"
   },
   {
     "id": 60,
@@ -1862,7 +1862,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。新的情感消息、创意灵感或直觉出现，适合以好奇和温柔接近。",
       "decision": "面对具体决定，用简单、非指责的语言表达一个感受。同时留意：把敏感变成戏剧化，或因害怕被笑而压住创造力。"
     },
-    "image": "./assets/cards/c11.webp"
+    "image": "./assets/decks/classic-rws/minor/c11.webp"
   },
   {
     "id": 61,
@@ -1910,7 +1910,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。情感邀请、浪漫追求或理想驱动的行动出现，适合真诚表达与创造。",
       "decision": "面对具体决定，把美好意图转换成一个可以兑现的承诺。同时留意：爱上想象中的故事，而非真实的人和条件。"
     },
-    "image": "./assets/cards/c12.webp"
+    "image": "./assets/decks/classic-rws/minor/c12.webp"
   },
   {
     "id": 62,
@@ -1958,7 +1958,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。能够容纳复杂情绪、倾听直觉并温柔照料，同时保持内在边界。",
       "decision": "面对具体决定，先照顾自己的情绪容量，再决定能给出多少。同时留意：失去边界、被他人情绪牵引或沉浸幻想。"
     },
-    "image": "./assets/cards/c13.webp"
+    "image": "./assets/decks/classic-rws/minor/c13.webp"
   },
   {
     "id": 63,
@@ -2005,7 +2005,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。能够在复杂情绪中保持稳定，以同理、节制和责任回应他人。",
       "decision": "面对具体决定，承认感受，同时用稳定行为承担责任。同时留意：把情绪管理变成压抑，或用温柔外表掩盖操控。"
     },
-    "image": "./assets/cards/c14.webp"
+    "image": "./assets/decks/classic-rws/minor/c14.webp"
   },
   {
     "id": 64,
@@ -2052,7 +2052,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。新的工作、金钱、身体或现实机会出现，需要通过持续行动让潜力生根。",
       "decision": "面对具体决定，确认资源、时间和第一项可交付成果。同时留意：把机会当作保证，或因害怕风险拒绝一切开始。"
     },
-    "image": "./assets/cards/p01.webp"
+    "image": "./assets/decks/classic-rws/minor/p01.webp"
   },
   {
     "id": 65,
@@ -2100,7 +2100,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。需要在多项任务、资源或角色之间灵活调整，变化可以被管理。",
       "decision": "面对具体决定，只保留两项当前重点，并建立清晰时间边界。同时留意：长期杂耍导致注意力和资源被耗尽。"
     },
-    "image": "./assets/cards/p02.webp"
+    "image": "./assets/decks/classic-rws/minor/p02.webp"
   },
   {
     "id": 66,
@@ -2148,7 +2148,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。专业技能、协作和明确分工正在形成，适合学习反馈并共同建造。",
       "decision": "面对具体决定，明确角色、标准和下一次反馈节点。同时留意：轻视基础训练，或让团队政治替代实际能力。"
     },
-    "image": "./assets/cards/p03.webp"
+    "image": "./assets/decks/classic-rws/minor/p03.webp"
   },
   {
     "id": 67,
@@ -2196,7 +2196,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。保护资源、建立边界和储备是必要的，但需要检查安全是否变成紧缩。",
       "decision": "面对具体决定，明确最低安全储备，并决定一部分可以流动的资源。同时留意：把拥有等同于安全，因控制失去关系和活力。"
     },
-    "image": "./assets/cards/p04.webp"
+    "image": "./assets/decks/classic-rws/minor/p04.webp"
   },
   {
     "id": 68,
@@ -2243,7 +2243,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。现实困难、孤立或资源压力需要被承认，同时要主动寻找可用支持。",
       "decision": "面对具体决定，列出可以联系的机构、朋友或现实资源，并发出一个请求。同时留意：把暂时匮乏当成个人失败，因羞耻错过支持。"
     },
-    "image": "./assets/cards/p05.webp"
+    "image": "./assets/decks/classic-rws/minor/p05.webp"
   },
   {
     "id": 69,
@@ -2291,7 +2291,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。资源流动需要公平、清楚条件和尊严，适合给予、接受或重新分配。",
       "decision": "面对具体决定，说明给予或借贷的条件，并保留双方尊严。同时留意：以慷慨控制他人，或因自尊拒绝合理支持。"
     },
-    "image": "./assets/cards/p06.webp"
+    "image": "./assets/decks/classic-rws/minor/p06.webp"
   },
   {
     "id": 70,
@@ -2339,7 +2339,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。投入正在累积，适合耐心评估、调整方法并尊重成长周期。",
       "decision": "面对具体决定，设定一个明确评估指标和下次检查时间。同时留意：把沉没成本当作必须继续的理由，或过早否定成长。"
     },
-    "image": "./assets/cards/p07.webp"
+    "image": "./assets/decks/classic-rws/minor/p07.webp"
   },
   {
     "id": 71,
@@ -2387,7 +2387,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。持续练习、细节和工艺正在提升能力，适合建立稳定学习或工作流程。",
       "decision": "面对具体决定，安排一个可重复的练习周期，并记录反馈。同时留意：把工作变成无休止证明，忽略休息和整体方向。"
     },
-    "image": "./assets/cards/p08.webp"
+    "image": "./assets/decks/classic-rws/minor/p08.webp"
   },
   {
     "id": 72,
@@ -2435,7 +2435,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。独立、稳定和长期努力带来成果，适合享受品质并确认自己的能力。",
       "decision": "面对具体决定，承认你独立完成的成果，并维护可持续生活节奏。同时留意：用成就隔绝关系，或通过外在标准证明价值。"
     },
-    "image": "./assets/cards/p09.webp"
+    "image": "./assets/decks/classic-rws/minor/p09.webp"
   },
   {
     "id": 73,
@@ -2483,7 +2483,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。长期财富、家庭支持、组织传承或稳定系统值得建设和维护。",
       "decision": "面对具体决定，讨论长期规则、责任和传承方式，而不只看眼前收益。同时留意：为了家族或组织形象牺牲个人真实需要。"
     },
-    "image": "./assets/cards/p10.webp"
+    "image": "./assets/decks/classic-rws/minor/p10.webp"
   },
   {
     "id": 74,
@@ -2531,7 +2531,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。学习、工作或财务上的新机会出现，适合踏实研究和建立基本功。",
       "decision": "面对具体决定，制定一份具体学习计划，并完成第一个小成果。同时留意：因为进展慢而失去兴趣，或只谈计划不执行。"
     },
-    "image": "./assets/cards/p11.webp"
+    "image": "./assets/decks/classic-rws/minor/p11.webp"
   },
   {
     "id": 75,
@@ -2579,7 +2579,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。缓慢但可靠的执行能够带来长期结果，适合按计划完成责任。",
       "decision": "面对具体决定，把目标拆成固定节奏，持续完成而不过度加速。同时留意：把稳定变成拒绝变化，或在责任中失去生命感。"
     },
-    "image": "./assets/cards/p12.webp"
+    "image": "./assets/decks/classic-rws/minor/p12.webp"
   },
   {
     "id": 76,
@@ -2627,7 +2627,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。能够通过身体感受、照料和现实管理创造安全丰盛的环境。",
       "decision": "面对具体决定，先满足一个基础身体需要，再安排对他人的照料。同时留意：把照料变成控制，或只照顾别人不照顾自己。"
     },
-    "image": "./assets/cards/p13.webp"
+    "image": "./assets/decks/classic-rws/minor/p13.webp"
   },
   {
     "id": 77,
@@ -2675,7 +2675,7 @@ const MINOR_CARDS = [
       "emotion": "情绪层面，先允许相关感受存在，再区分感受、想象与现实事实。有能力管理资源、建立制度并承担长期现实责任，适合稳健决策。",
       "decision": "面对具体决定，用透明标准管理资源，并考虑长期影响。同时留意：把财富或职位当成支配他人的许可。"
     },
-    "image": "./assets/cards/p14.webp"
+    "image": "./assets/decks/classic-rws/minor/p14.webp"
   }
 ];
 
@@ -2721,3 +2721,5 @@ Object.assign(ENERGY_EXPLANATIONS, {
 });
 window.LIFE_MIRROR_DATA.cards = TAROT_CARDS;
 window.LIFE_MIRROR_DATA.total = TAROT_CARDS.length;
+
+MINOR_CARDS.forEach(card => { card.classicImage = card.image; });

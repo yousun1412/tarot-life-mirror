@@ -225,7 +225,8 @@ const state = {
   recordId: '',
   choiceA: '',
   choiceB: '',
-  recommendation: null
+  recommendation: null,
+  deckId: window.LifeMirrorDecks?.currentId || 'classic-rws'
 };
 
 const $ = id => document.getElementById(id);
@@ -246,6 +247,17 @@ function safe(value) {
     .replaceAll('>', '&gt;')
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;');
+}
+
+function cardPresentation(selection) {
+  const card = selection?.card || selection;
+  const requestedDeckId = selection?.deckId || state.deckId || window.LifeMirrorDecks?.currentId || 'classic-rws';
+  const preferredResolvedDeckId = selection?.resolvedDeckId || '';
+  return window.LifeMirrorDecks?.resolveCard(card, requestedDeckId, preferredResolvedDeckId) || card;
+}
+
+function currentDeckLabel(deckId = state.deckId) {
+  return window.LifeMirrorDecks?.registry?.[deckId]?.name || '经典韦特';
 }
 
 function renderProgress() {
@@ -648,6 +660,8 @@ function promptCardNumber() {
 
 function makeCard(selection) {
   const { card, orientation } = selection;
+  const presentation = cardPresentation(selection);
+  const imageSrc = presentation.image || card.image;
   const wrapper = document.createElement('div');
   wrapper.className = `tarot-card orientation-${orientation}`;
   wrapper.dataset.orientation = orientation;
@@ -665,8 +679,8 @@ function makeCard(selection) {
           </div>
           <img
             class="tarot-image"
-            src="${safe(card.image)}"
-            alt="${safe(card.name)}完整 Rider–Waite–Smith 牌面"
+            src="${safe(imageSrc)}"
+            alt="${safe(card.name)}${safe(currentDeckLabel(selection.deckId))}牌面"
             loading="eager"
             decoding="async"
             onerror="this.hidden=true; this.parentElement.classList.add('image-error')"
@@ -691,7 +705,9 @@ function drawCardByNumber(number, options = {}) {
   }
 
   const orientation = randomOrientation();
-  const selection = { card, orientation, deckNumber: number, drawMode: state.drawMode || 'manual' };
+  const requestedDeckId = state.deckId || window.LifeMirrorDecks?.currentId || 'classic-rws';
+  const resolvedDeckId = window.LifeMirrorDecks?.getResolvedDeckId(card, requestedDeckId) || 'classic-rws';
+  const selection = { card, orientation, deckNumber: number, drawMode: state.drawMode || 'manual', deckId: requestedDeckId, resolvedDeckId };
   const targetIndex = state.selected.length;
   const slot = document.querySelector(`[data-slot="${targetIndex}"]`);
   slot.querySelector('.empty-label')?.remove();
@@ -820,7 +836,7 @@ function saveObservation(cardIndex, label, meaning) {
   );
 
   document.querySelectorAll('.tarot-card').forEach((card, index) => {
-    card.onclick = () => window.LifeMirrorViewer?.open(state.selected[index].card, state.selected[index].orientation);
+    card.onclick = () => window.LifeMirrorViewer?.open(state.selected[index].card, state.selected[index].orientation, state.selected[index].deckId, state.selected[index].resolvedDeckId);
   });
 
   if (isPeriodicReading()) window.LifeMirrorStorage?.save(getCurrentReadingSnapshot());
@@ -1052,6 +1068,8 @@ function buildOverallSummary() {
 
 function cardReadingHTML(selection, index, position) {
   const { card, orientation } = selection;
+  const presentation = cardPresentation(selection);
+  const imageSrc = presentation.image || card.image;
   const data = getOrientationData(selection);
   const orientationText = orientation === 'upright' ? '正位' : '逆位';
   const symbolHtml = parseSymbols(card)
@@ -1068,11 +1086,11 @@ function cardReadingHTML(selection, index, position) {
 
   return `
     <article class="card-reading" id="card-reading-${index}">
-      <figure class="reading-card-preview ${orientation}" role="button" tabindex="0" data-card-id="${card.id}" data-orientation="${orientation}" aria-label="放大查看${safe(card.name)}${orientation === 'reversed' ? '逆位' : '正位'}牌面">
+      <figure class="reading-card-preview ${orientation}" role="button" tabindex="0" data-card-id="${card.id}" data-orientation="${orientation}" data-deck-id="${safe(selection.deckId || state.deckId)}" data-resolved-deck-id="${safe(selection.resolvedDeckId || presentation.resolvedDeckId || '')}" aria-label="放大查看${safe(card.name)}${orientation === 'reversed' ? '逆位' : '正位'}牌面">
         <div class="reading-image-frame">
           <img
-            src="${safe(card.image)}"
-            alt="${safe(card.name)}完整牌面"
+            src="${safe(imageSrc)}"
+            alt="${safe(card.name)}${safe(currentDeckLabel(selection.deckId))}牌面"
             loading="lazy"
             decoding="async"
             onerror="this.closest('.reading-card-preview').classList.add('image-error')"
@@ -1235,7 +1253,7 @@ function showFullInterpretation(focusIndex = 0) {
   });
 
   document.querySelectorAll('.reading-card-preview').forEach(preview => {
-    const openPreview = () => window.LifeMirrorViewer?.open(Number(preview.dataset.cardId), preview.dataset.orientation);
+    const openPreview = () => window.LifeMirrorViewer?.open(Number(preview.dataset.cardId), preview.dataset.orientation, preview.dataset.deckId, preview.dataset.resolvedDeckId);
     preview.onclick = openPreview;
     preview.onkeydown = event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openPreview(); } };
   });
@@ -1305,6 +1323,8 @@ function getCurrentReadingSnapshot() {
     timestamp: Date.now(),
     date: new Date().toLocaleString(),
     readingType: state.readingType || 'reflection',
+    deckId: state.deckId || window.LifeMirrorDecks?.currentId || 'classic-rws',
+    deckVersion: window.LifeMirrorDecks?.registry?.[state.deckId || window.LifeMirrorDecks?.currentId || 'classic-rws']?.version || '1.0.0',
     dayKey: state.dayKey || '',
     weekKey: state.weekKey || '',
     monthKey: state.monthKey || '',
@@ -1324,7 +1344,9 @@ function getCurrentReadingSnapshot() {
       id: item.card.id,
       name: item.card.name,
       en: item.card.en,
-      image: item.card.image,
+      image: cardPresentation(item).image || item.card.image,
+      deckId: item.deckId || state.deckId || 'classic-rws',
+      resolvedDeckId: item.resolvedDeckId || window.LifeMirrorDecks?.getResolvedDeckId(item.card, item.deckId || state.deckId) || 'classic-rws',
       orientation: item.orientation,
       position: positions[index]?.label || '此刻需要看见',
       deckNumber: item.deckNumber ?? null,
@@ -1531,7 +1553,9 @@ function restoreSavedReading(record) {
       card,
       orientation: raw.orientation === 'reversed' ? 'reversed' : 'upright',
       deckNumber: raw.deckNumber ?? null,
-      drawMode: raw.drawMode || record.drawMode || 'manual'
+      drawMode: raw.drawMode || record.drawMode || 'manual',
+      deckId: raw.deckId || record.deckId || 'classic-rws',
+      resolvedDeckId: raw.resolvedDeckId || window.LifeMirrorDecks?.getResolvedDeckId(card, raw.deckId || record.deckId || 'classic-rws') || 'classic-rws'
     } : null;
   }).filter(Boolean);
 
@@ -1568,6 +1592,7 @@ function restoreSavedReading(record) {
     choiceA: record.choiceA || '',
     choiceB: record.choiceB || '',
     recommendation: record.recommendation || null,
+    deckId: record.deckId || 'classic-rws',
     recordId: record.id || (readingType === 'weekly' ? `weekly-${getLocalWeekInfo().key}` : readingType === 'monthly' ? `monthly-${getLocalMonthInfo().key}` : `daily-${localDayKey()}`)
   });
 
@@ -1583,7 +1608,7 @@ function restoreSavedReading(record) {
     cardElement.classList.add('revealed', 'reveal-complete');
     if (selection.orientation === 'reversed') cardElement.classList.add('turn-reversed');
     slot?.insertBefore(cardElement, slot.firstChild);
-    cardElement.onclick = () => window.LifeMirrorViewer?.open(selection.card, selection.orientation);
+    cardElement.onclick = () => window.LifeMirrorViewer?.open(selection.card, selection.orientation, selection.deckId, selection.resolvedDeckId);
   });
 
   setDialogue(isWeeklyReading()
@@ -1779,6 +1804,7 @@ function renderHistory() { window.LifeMirrorHistory?.render(); }
 function start() {
   state.step = 0;
   state.readingType = 'reflection';
+  state.deckId = window.LifeMirrorDecks?.currentId || state.deckId || 'classic-rws';
   renderProgress();
   renderSlots();
   clearDeck();
@@ -1824,7 +1850,8 @@ function reset() {
     recordId: '',
     choiceA: '',
     choiceB: '',
-    recommendation: null
+    recommendation: null,
+    deckId: window.LifeMirrorDecks?.currentId || 'classic-rws'
   });
 
   panel.hidden = true;
@@ -1859,6 +1886,7 @@ $('resetBtn').onclick = reset;
 $('closeInterpretation').onclick = () => panel.hidden = true;
 $('aboutBtn').onclick = () => $('aboutDialog').showModal();
 $('closeAbout').onclick = () => $('aboutDialog').close();
+$('deckBtn').onclick = () => window.LifeMirrorDeckUI?.open();
 $('libraryBtn').onclick = () => window.LifeMirrorLibrary?.open();
 $('historyBtn').onclick = () => window.LifeMirrorInsights?.open();
 $('aboutPrivacyBtn').onclick = () => { $('aboutDialog').close(); $('privacyDialog').showModal(); };
@@ -1871,11 +1899,21 @@ window.LifeMirrorLearning?.init();
 window.LifeMirrorShare?.init();
 window.LifeMirrorHistory?.init();
 window.LifeMirrorInsights?.init();
+window.LifeMirrorDeckUI?.init();
+
+
+window.addEventListener('life-mirror-deck-change', () => {
+  if (!state.selected.length && state.step === 0) {
+    state.deckId = window.LifeMirrorDecks?.currentId || 'classic-rws';
+    start();
+  }
+});
 
 const requestedAction = new URLSearchParams(location.search).get('action');
 start();
 if (requestedAction === 'start') setTimeout(chooseTopic, 200);
 if (requestedAction === 'history' || requestedAction === 'insights') setTimeout(() => window.LifeMirrorInsights?.open(), 200);
+if (requestedAction === 'decks') setTimeout(() => window.LifeMirrorDeckUI?.open(), 200);
 if (requestedAction === 'library') setTimeout(() => window.LifeMirrorLibrary?.open(), 200);
 if (requestedAction === 'learn') setTimeout(() => window.LifeMirrorLearning?.open(), 200);
 if (requestedAction === 'daily') setTimeout(beginDailyFortune, 200);

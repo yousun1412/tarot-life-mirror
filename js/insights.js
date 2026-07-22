@@ -1,4 +1,4 @@
-/* V21 日历、周期回顾与个人统计。 */
+/* V22 日历、周期回顾、个人统计与牌组记录。 */
 (() => {
   let dialog, tabs, content;
   let activeTab = 'calendar';
@@ -19,7 +19,7 @@
   const percentage = (value, total) => total ? Math.round(value / total * 100) : 0;
   const recordCard = record => {
     const images = (record.cards || []).slice(0, 4).map(item => {
-      const card = cards().find(card => Number(card.id) === Number(item.id)) || item;
+      const card = window.LifeMirrorDecks?.resolveRawCard(item, record.deckId) || cards().find(card => Number(card.id) === Number(item.id)) || item;
       return `<img class="${item.orientation === 'reversed' ? 'reversed' : ''}" src="${safe(card.image || item.image || '')}" alt="${safe(card.name || item.name || '牌面')}">`;
     }).join('');
     const reviewed = Boolean(record.review?.updatedAt || record.review?.actual || record.review?.lesson);
@@ -29,7 +29,7 @@
         <span class="tiny-label"><b class="record-type-dot ${typeClass(record.readingType)}"></b>${safe(typeLabel(record.readingType))} · ${safe(formatDate(record.timestamp))}</span>
         <h4>${safe(record.question || record.topic || '未命名记录')}</h4>
         <p>${safe(record.summary || record.reflection || '尚未填写摘要')}</p>
-        <div class="insight-record-meta"><span>${(record.cards || []).length}张牌</span><span>${record.drawMode === 'fate' ? '交给命运' : '自选数字'}</span>${reviewed ? '<span class="reviewed-chip">已回顾</span>' : ''}</div>
+        <div class="insight-record-meta"><span>${(record.cards || []).length}张牌</span><span>${safe(window.LifeMirrorDecks?.registry?.[record.deckId||'classic-rws']?.name||'经典韦特')}</span><span>${record.drawMode === 'fate' ? '交给命运' : '自选数字'}</span>${reviewed ? '<span class="reviewed-chip">已回顾</span>' : ''}</div>
       </div>
     </article>`;
   };

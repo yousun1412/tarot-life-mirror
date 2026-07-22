@@ -1,8 +1,14 @@
 (() => {
   let dialog, canvas, ctx, target = null, includeQuestion, status;
   const W = 1080, H = 1350;
-  const cardData = raw => window.LIFE_MIRROR_DATA?.cards?.find(card => card.id === raw.id) || window.LIFE_MIRROR_DATA?.cards?.find(card => card.name === raw.name) || raw;
-  const loadImage = src => new Promise((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = src; });
+  const cardData = raw => window.LifeMirrorDecks?.resolveRawCard(raw, target?.deckId || window.LifeMirrorDecks?.currentId) || window.LIFE_MIRROR_DATA?.cards?.find(card => card.id === raw.id) || window.LIFE_MIRROR_DATA?.cards?.find(card => card.name === raw.name) || raw;
+  const loadCardImage = async (raw, card) => {
+    if (window.LifeMirrorDecks?.loadCardImage) {
+      const result = await window.LifeMirrorDecks.loadCardImage(card, raw.deckId || target?.deckId || window.LifeMirrorDecks.currentId, raw.resolvedDeckId || card.resolvedDeckId || '');
+      return result.image;
+    }
+    return new Promise((resolve, reject) => { const img = new Image(); img.onload = () => resolve(img); img.onerror = reject; img.src = card.image; });
+  };
 
   function roundedRect(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill();}
   function wrap(text, x, y, maxWidth, lineHeight, maxLines = 99) {
@@ -38,7 +44,8 @@
           : target.spread === 'celtic-ten' ? '凯尔特十字 · 十张牌'
           : (target.spread === 'three' ? '三张反思牌阵' : '此刻需要看见');
     ctx.fillStyle='#f7edd8';ctx.font='700 51px serif';ctx.fillText(shareTitle,72,162);
-    ctx.fillStyle='rgba(247,237,216,.65)';ctx.font='24px sans-serif';ctx.fillText(`${target.periodLabel || target.topic || '自我反思'} · ${target.drawMode==='fate'?'交给命运':'自选数字'} · ${target.date || new Date().toLocaleDateString()}`,72,205);
+    ctx.fillStyle='rgba(247,237,216,.65)';ctx.font='24px sans-serif';const deckName = window.LifeMirrorDecks?.registry?.[target.deckId || 'classic-rws']?.name || '经典韦特';
+    ctx.fillText(`${target.periodLabel || target.topic || '自我反思'} · ${deckName} · ${target.drawMode==='fate'?'交给命运':'自选数字'} · ${target.date || new Date().toLocaleDateString()}`,72,205);
     let y=260;
     if(includeQuestion.checked && target.question){ctx.fillStyle='rgba(255,255,255,.07)';roundedRect(62,y,W-124,128,24);ctx.fillStyle='#f4e9d5';ctx.font='28px sans-serif';y=wrap(`“${target.question}”`,88,y+46,W-176,39,2)+30;} else y+=20;
     const cards=target.cards||[];
@@ -58,7 +65,7 @@
         for(let col=0;col<indexes.length;col++){
           const i=indexes[col], raw=cards[i], card=cardData(raw), x=startX+col*(cardW+gapX), cardY=y+row*(cardH+gapY);
           ctx.fillStyle='rgba(0,0,0,.32)';roundedRect(x-6,cardY-6,cardW+12,cardH+12,16);
-          try{const img=await loadImage(card.image);fitImage(img,x,cardY,cardW,cardH,raw.orientation==='reversed');}catch(e){ctx.fillStyle='#2b2038';roundedRect(x,cardY,cardW,cardH,14);ctx.fillStyle='#fff';ctx.font='26px sans-serif';ctx.textAlign='center';ctx.fillText(card.name,x+cardW/2,cardY+cardH/2);ctx.textAlign='left';}
+          try{const img=await loadCardImage(raw,card);fitImage(img,x,cardY,cardW,cardH,raw.orientation==='reversed');}catch(e){ctx.fillStyle='#2b2038';roundedRect(x,cardY,cardW,cardH,14);ctx.fillStyle='#fff';ctx.font='26px sans-serif';ctx.textAlign='center';ctx.fillText(card.name,x+cardW/2,cardY+cardH/2);ctx.textAlign='left';}
           ctx.fillStyle='#f7edd8';ctx.font=`700 ${maxCols>=5?14:18}px sans-serif`;ctx.textAlign='center';ctx.fillText(`${raw.position||''}｜${card.name}${raw.orientation==='reversed'?'（逆）':''}`,x+cardW/2,cardY+cardH+30);ctx.textAlign='left';
         }
       }
@@ -68,7 +75,7 @@
       for(let i=0;i<cards.length;i++){
         const raw=cards[i], card=cardData(raw), x=start+i*(cardW+gap);
         ctx.fillStyle='rgba(0,0,0,.32)';roundedRect(x-8,y-8,cardW+16,cardH+16,18);
-        try{const img=await loadImage(card.image);fitImage(img,x,y,cardW,cardH,raw.orientation==='reversed');}catch(e){ctx.fillStyle='#2b2038';roundedRect(x,y,cardW,cardH,14);ctx.fillStyle='#fff';ctx.font='34px sans-serif';ctx.textAlign='center';ctx.fillText(card.name,x+cardW/2,y+cardH/2);ctx.textAlign='left';}
+        try{const img=await loadCardImage(raw,card);fitImage(img,x,y,cardW,cardH,raw.orientation==='reversed');}catch(e){ctx.fillStyle='#2b2038';roundedRect(x,y,cardW,cardH,14);ctx.fillStyle='#fff';ctx.font='34px sans-serif';ctx.textAlign='center';ctx.fillText(card.name,x+cardW/2,y+cardH/2);ctx.textAlign='left';}
         ctx.fillStyle='#f7edd8';ctx.font='700 24px sans-serif';ctx.textAlign='center';ctx.fillText(`${raw.position ? raw.position+'｜' : ''}${card.name}${raw.orientation==='reversed'?'（逆）':''}${raw.deckNumber ? ' · #'+raw.deckNumber : ''}`,x+cardW/2,y+cardH+42);ctx.textAlign='left';
       }
       y += cardH+92;

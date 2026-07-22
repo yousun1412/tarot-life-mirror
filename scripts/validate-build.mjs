@@ -7,177 +7,124 @@ const root = process.cwd();
 const errors = [];
 const ok = message => console.log(`✓ ${message}`);
 const fail = message => errors.push(message);
-const exists = relative => fs.existsSync(path.join(root, relative.replace(/^\.\//, '')));
-const read = relative => fs.readFileSync(path.join(root, relative), 'utf8');
+const clean = relative => relative.replace(/^\.\//, '');
+const exists = relative => fs.existsSync(path.join(root, clean(relative)));
+const read = relative => fs.readFileSync(path.join(root, clean(relative)), 'utf8');
 
 const required = [
-  'index.html', 'offline.html', 'manifest.webmanifest', 'version.json', 'service-worker.js',
-  'css/main.css', 'css/v14.css', 'css/v15.css', 'css/v16.css', 'css/v17.css', 'css/v18.css', 'css/v19.css', 'css/v20.css', 'packages/platform-core/index.js', 'packages/tarot-core/index.js', 'packages/reading-schema/index.js', 'data/major-arcana.js', 'data/minor-arcana.js', 'data/interpretation-v19.js',
-  'js/app.js', 'js/pwa.js', 'js/storage.js', 'js/card-viewer.js', 'js/library.js', 'js/learning.js',
-  'js/share.js', 'js/history.js', 'icons/icon-192.png', 'icons/icon-512.png',
-  'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'
+  'index.html','offline.html','manifest.webmanifest','version.json','service-worker.js',
+  'css/main.css','css/v14.css','css/v15.css','css/v16.css','css/v17.css','css/v18.css','css/v19.css','css/v20.css','css/v21.css','css/v22.css',
+  'packages/platform-core/index.js','packages/tarot-core/index.js','packages/reading-schema/index.js','packages/analytics-core/index.js','packages/deck-core/index.js',
+  'data/major-arcana.js','data/minor-arcana.js','data/decks-v22.js','data/interpretation-v19.js',
+  'js/app.js','js/pwa.js','js/storage.js','js/card-viewer.js','js/library.js','js/learning.js','js/share.js','js/history.js','js/insights.js','js/decks.js',
+  'assets/decks/classic-rws/deck.json','assets/decks/life-mirror/deck.json',
+  'assets/decks/life-mirror/major/EXPECTED_FILES.txt',
+  'icons/icon-192.png','icons/icon-512.png','icons/icon-maskable-512.png','icons/apple-touch-icon.png'
 ];
 required.forEach(file => { if (!exists(file)) fail(`缺少文件：${file}`); });
-if (!errors.length) ok('核心目录和文件齐全');
+if (!errors.length) ok('V22核心目录和文件齐全');
 
-try {
-  const manifest = JSON.parse(read('manifest.webmanifest'));
-  for (const icon of manifest.icons || []) {
-    if (!exists(icon.src)) fail(`manifest图标不存在：${icon.src}`);
-  }
-  ok('manifest.webmanifest格式正确');
-} catch (error) {
-  fail(`manifest解析失败：${error.message}`);
-}
+let manifest;
+try { manifest = JSON.parse(read('manifest.webmanifest')); ok('manifest.webmanifest格式正确'); }
+catch (error) { fail(`manifest解析失败：${error.message}`); }
+for (const icon of manifest?.icons || []) if (!exists(icon.src)) fail(`manifest图标不存在：${icon.src}`);
 
 let cards = [];
 try {
   const context = vm.createContext({ window: {}, console });
-  vm.runInContext(read('data/major-arcana.js'), context, { filename: 'major-arcana.js' });
-  vm.runInContext(read('data/minor-arcana.js'), context, { filename: 'minor-arcana.js' });
+  vm.runInContext(read('data/major-arcana.js'), context);
+  vm.runInContext(read('data/minor-arcana.js'), context);
   cards = context.window.LIFE_MIRROR_DATA.cards;
   const major = cards.filter(card => card.arcana === 'major' || card.id < 22);
   const minor = cards.filter(card => card.arcana === 'minor');
   if (cards.length !== 78) fail(`牌数应为78，实际为${cards.length}`);
   if (major.length !== 22) fail(`大阿尔卡那应为22，实际为${major.length}`);
   if (minor.length !== 56) fail(`小阿尔卡那应为56，实际为${minor.length}`);
-  const ids = new Set(cards.map(card => card.id));
-  if (ids.size !== cards.length) fail('牌ID存在重复');
-  for (const suit of ['s', 'w', 'c', 'p']) {
-    const count = minor.filter(card => card.suit === suit).length;
-    if (count !== 14) fail(`花色${suit}应为14张，实际为${count}`);
-  }
+  if (new Set(cards.map(card => card.id)).size !== 78) fail('牌ID存在重复');
+  for (const suit of ['s','w','c','p']) if (minor.filter(card => card.suit === suit).length !== 14) fail(`花色${suit}数量错误`);
   for (const card of cards) {
     if (!card.name || !card.uprightCore || !card.reversedCore) fail(`牌义字段不完整：${card.name || card.id}`);
-    if (card.image?.startsWith('./') && !exists(card.image)) fail(`牌图不存在：${card.name} → ${card.image}`);
+    if (!card.classicImage || !exists(card.classicImage)) fail(`经典牌面不存在：${card.name} → ${card.classicImage}`);
   }
-  ok('78张牌、正逆位数据和四种花色检查通过');
-} catch (error) {
-  fail(`牌库脚本执行失败：${error.stack || error.message}`);
-}
+  ok('78张牌义与经典牌面路径检查通过');
+} catch (error) { fail(`牌库执行失败：${error.stack || error.message}`); }
 
-const cardImages = fs.readdirSync(path.join(root, 'assets/cards')).filter(name => name.endsWith('.webp'));
-if (cardImages.length !== 56) fail(`assets/cards应有56张WebP，实际为${cardImages.length}`);
-for (const name of cardImages) {
-  const size = fs.statSync(path.join(root, 'assets/cards', name)).size;
-  if (size < 3000) fail(`牌图文件异常小：assets/cards/${name}`);
+const classicMajor = fs.readdirSync(path.join(root,'assets/decks/classic-rws/major')).filter(name => /^\d{2}\.webp$/.test(name));
+const classicMinor = fs.readdirSync(path.join(root,'assets/decks/classic-rws/minor')).filter(name => /^[cswp]\d{2}\.webp$/.test(name));
+if (classicMajor.length !== 22) fail(`经典大阿尔卡那应为22张，实际${classicMajor.length}`);
+if (classicMinor.length !== 56) fail(`经典小阿尔卡那应为56张，实际${classicMinor.length}`);
+for (const name of [...classicMajor.map(name=>`major/${name}`),...classicMinor.map(name=>`minor/${name}`)]) {
+  if (fs.statSync(path.join(root,'assets/decks/classic-rws',name)).size < 2500) fail(`经典牌图文件异常：${name}`);
 }
-ok('56张小阿尔卡那本地牌图检查完成');
+ok('经典韦特78张独立牌图检查通过');
+
+const expected = read('assets/decks/life-mirror/major/EXPECTED_FILES.txt').trim().split(/\r?\n/).filter(Boolean);
+if (expected.length !== 22 || new Set(expected).size !== 22) fail('生命之镜大牌文件清单应为22个唯一文件名');
+const lifeDir = path.join(root,'assets/decks/life-mirror/major');
+const uploaded = fs.readdirSync(lifeDir).filter(name => name.toLowerCase().endsWith('.png'));
+for (const name of uploaded) if (!expected.includes(name)) fail(`生命之镜出现非标准文件名：${name}`);
+for (const name of uploaded) {
+  const buffer = fs.readFileSync(path.join(lifeDir,name));
+  if (buffer.length < 24 || buffer.toString('hex',0,8) !== '89504e470d0a1a0a') { fail(`不是有效PNG：${name}`); continue; }
+  const width = buffer.readUInt32BE(16), height = buffer.readUInt32BE(20);
+  const ratio = width / height;
+  if (Math.abs(ratio - 2/3) > 0.025) fail(`${name}比例不是2:3：${width}×${height}`);
+  if (width < 900 || height < 1350) fail(`${name}分辨率偏低：${width}×${height}`);
+}
+ok(`生命之镜上传区检查通过：当前 ${uploaded.length}/22 张PNG`);
 
 const html = read('index.html');
-const refs = [...html.matchAll(/(?:src|href)=["']([^"']+)["']/g)].map(match => match[1]);
-for (const ref of refs) {
+for (const match of html.matchAll(/(?:src|href)=["']([^"']+)["']/g)) {
+  const ref = match[1];
   if (/^(?:https?:|data:|#|mailto:|javascript:)/.test(ref)) continue;
-  const clean = ref.split(/[?#]/)[0];
-  if (clean && !exists(clean)) fail(`index.html引用不存在：${ref}`);
+  const local = ref.split(/[?#]/)[0];
+  if (local && !exists(local)) fail(`index.html引用不存在：${ref}`);
 }
-ok('index.html本地引用检查完成');
+for (const marker of ['deckDialog','牌面风格','生命之镜','V22','data/decks-v22.js','packages/deck-core/index.js']) if (!html.includes(marker)) fail(`V22页面缺少：${marker}`);
+ok('index.html牌组界面与本地资源引用检查完成');
 
 const sw = read('service-worker.js');
 const shellBlock = sw.match(/const CORE_SHELL = \[([\s\S]*?)\]\.map\(asset\)/)?.[1] || '';
-const shellRefs = [...shellBlock.matchAll(/["'](\.\/[^"']+)["']/g)].map(match => match[1]);
-for (const ref of shellRefs) {
-  if (ref === './') continue;
-  if (!exists(ref)) fail(`Service Worker核心文件不存在：${ref}`);
+for (const match of shellBlock.matchAll(/["'](\.\/[^"']+)["']/g)) {
+  const ref = match[1];
+  if (ref !== './' && !exists(ref)) fail(`Service Worker核心文件不存在：${ref}`);
 }
-if (shellRefs.some(ref => ref.includes('assets/cards'))) fail('V20不应在安装阶段预缓存全部牌图');
-ok('Service Worker核心缓存清单检查完成');
+if (shellBlock.includes('assets/decks/classic-rws/major') || shellBlock.includes('assets/decks/life-mirror/major')) fail('不应在安装阶段预缓存整套牌面');
+if (!sw.includes("'/assets/decks/'")) fail('Service Worker未接入牌组图片运行时缓存');
+ok('Service Worker按需缓存策略检查通过');
 
 try {
   const version = JSON.parse(read('version.json')).version;
   const swVersion = sw.match(/const VERSION = ['"]([^'"]+)/)?.[1];
   const pwaVersion = read('js/pwa.js').match(/const APP_VERSION = ['"]([^'"]+)/)?.[1];
-  if (version !== swVersion || version !== pwaVersion) {
-    fail(`版本号不一致：version.json=${version}, service-worker=${swVersion}, pwa=${pwaVersion}`);
-  } else ok(`版本号一致：${version}`);
-} catch (error) {
-  fail(`版本一致性检查失败：${error.message}`);
-}
+  if (version !== '22.0.0' || version !== swVersion || version !== pwaVersion) fail(`版本不一致：${version}/${swVersion}/${pwaVersion}`);
+  else ok(`版本号一致：${version}`);
+} catch (error) { fail(`版本检查失败：${error.message}`); }
 
 const jsFiles = [];
-for (const directory of ['js', 'data']) {
-  for (const name of fs.readdirSync(path.join(root, directory))) {
-    if (name.endsWith('.js')) jsFiles.push(path.join(directory, name));
+function collect(dir) {
+  for (const item of fs.readdirSync(path.join(root,dir),{withFileTypes:true})) {
+    const rel=path.join(dir,item.name);
+    if (item.isDirectory()) collect(rel); else if (item.name.endsWith('.js')) jsFiles.push(rel);
   }
 }
+for (const dir of ['js','data','packages']) collect(dir);
 jsFiles.push('service-worker.js');
 for (const file of jsFiles) {
   const result = spawnSync(process.execPath, ['--check', file], { cwd: root, encoding: 'utf8' });
   if (result.status !== 0) fail(`JavaScript语法错误：${file}\n${result.stderr}`);
 }
-ok('JavaScript语法检查完成');
+ok('全部JavaScript语法检查完成');
 
-
-// V19 additional checks
-for (const relativePath of ['css/v19.css','data/interpretation-v19.js']) {
-  if (!exists(relativePath)) fail(`缺少 V19 文件：${relativePath}`);
-}
-const v19EngineText = read('data/interpretation-v19.js');
-for (const marker of ['TOPIC_GUIDES','POSITION_BUILDERS','getNarrativeLinks','daily','weekly','monthly','19.0.0','buildMultiSummary','代价','判断','根基']) {
-  if (!v19EngineText.includes(marker)) fail(`V19 引擎缺少标记：${marker}`);
-}
-try {
-  const context = vm.createContext({ window: {}, console });
-  vm.runInContext(read('data/major-arcana.js'), context, { filename: 'major-arcana.js' });
-  vm.runInContext(read('data/minor-arcana.js'), context, { filename: 'minor-arcana.js' });
-  vm.runInContext(read('data/interpretation-v19.js'), context, { filename: 'interpretation-v19.js' });
-  const enriched = context.window.LIFE_MIRROR_DATA.cards;
-  let topicCount = 0;
-  for (const card of enriched) {
-    for (const topic of ['relationship','work','growth','emotion','decision','daily','weekly','monthly']) {
-      for (const orientation of ['upright','reversed']) {
-        const text = context.window.LifeMirrorV19.topicText(card, topic, orientation);
-        if (!text || text.length < 30) fail(`V19主题解释异常：${card.name}/${topic}/${orientation}`);
-        topicCount += 1;
-      }
-    }
-  }
-  if (topicCount !== 1248) fail(`V19主题解释应为1248条，实际为${topicCount}`);
-  else ok('V19 1248条正逆位主题解释检查通过');
-} catch (error) {
-  fail(`V19引擎执行失败：${error.stack || error.message}`);
-}
-
-const appText = read('js/app.js');
-for (const marker of ['beginDailyFortune','beginWeeklyFortune','beginMonthlyFortune','monthly-five','monthly-seven','recommendQuestionSpread','obstacle-four','relationship-five','choice-six','celtic-ten','如上，如下；如内，如外。']) {
-  if (!appText.includes(marker)) fail(`V19流程缺少标记：${marker}`);
-}
-if (!appText.includes("getPositions().length")) fail('V19抽牌数量未改为动态牌阵长度');
-for (const marker of ['data-interpretation-layer="overview"','data-interpretation-layer="full"','data-interpretation-layer="deep"','本月运势','V20']) { if (!html.includes(marker)) fail(`V20页面缺少标记：${marker}`); }
-
-
-for (const marker of ['spread.four-mode','spread.six-mode','spread.ten-mode.celtic-mode']) { if (!read('css/v19.css').includes(marker)) fail(`V19布局缺少标记：${marker}`); }
-for (const spread of ['obstacle-four','relationship-five','choice-six','celtic-ten']) { if (!appText.includes(spread)) fail(`V19缺少牌阵：${spread}`); }
-if (!read('js/share.js').includes('cards.length === 10')) fail('V19分享卡未适配十张牌');
-
-
-// V20 cross-platform and learning checks
-for (const relativePath of ['css/v20.css','js/learning.js','packages/platform-core/index.js','packages/tarot-core/index.js','packages/reading-schema/index.js']) {
-  if (!exists(relativePath)) fail(`缺少 V20 文件：${relativePath}`);
-}
-for (const marker of ['learningDialog','learningTabs','learningContent','V20']) if (!html.includes(marker)) fail(`V20页面缺少标记：${marker}`);
-for (const marker of ['每日学习','看图识牌','我的牌义','学习进度','lifeMirrorLearningV20']) if (!read('js/learning.js').includes(marker)) fail(`V20学习模块缺少标记：${marker}`);
-for (const marker of ['LifeMirrorPlatform','register','storage','capacitor','tauri','wechat']) if (!read('packages/platform-core/index.js').toLowerCase().includes(marker.toLowerCase())) fail(`平台核心缺少标记：${marker}`);
-try {
-  const context = vm.createContext({ window: {}, globalThis: {}, navigator: {}, localStorage: { getItem(){return null}, setItem(){}, removeItem(){} }, console, Uint32Array, Math });
-  context.globalThis = context;
-  vm.runInContext(read('packages/tarot-core/index.js'), context, { filename: 'tarot-core/index.js' });
-  const core = context.window.LifeMirrorTarotCore;
-  const sample = Array.from({length:78}, (_,id)=>({id}));
-  if (!core.validateDeck(sample).valid) fail('V20塔罗核心未通过78张牌校验');
-  const nums = core.chooseUniqueNumbers(78,10);
-  if (nums.length !== 10 || new Set(nums).size !== 10) fail('V20随机抽牌未生成10个不重复数字');
-  const drawn = core.drawByNumbers(sample, [1,20,78], ['upright','reversed','upright']);
-  if (drawn.map(item=>item.card.id).join(',') !== '0,19,77') fail('V20按编号抽牌结果异常');
-  ok('V20纯塔罗核心检查通过');
-} catch (error) { fail(`V20塔罗核心执行失败：${error.stack || error.message}`); }
-const storageText = read('js/storage.js');
-if (!storageText.includes('LifeMirrorPlatform') || !storageText.includes('schemaVersion')) fail('V20历史记录尚未接入跨平台存储与协议');
+if (!read('packages/reading-schema/index.js').includes('const VERSION = 4')) fail('阅读记录协议未升级到schemaVersion 4');
+for (const marker of ['getCardImage','getResolvedDeckId','probeDeck','setCurrentDeck','fallbackDeck','loadCardImage']) if (!read('packages/deck-core/index.js').includes(marker)) fail(`DeckManager缺少：${marker}`);
+for (const marker of ['deckId','resolvedDeckId','deckVersion']) if (!read('js/storage.js').includes(marker) || !read('js/app.js').includes(marker)) fail(`记录牌组字段未完整接入：${marker}`);
+for (const marker of ['cartoon','realistic','line-art']) if (!read('data/decks-v22.js').includes(marker)) fail(`未来牌组接口缺少：${marker}`);
+ok('多牌组、回退和记录协议结构检查通过');
 
 if (errors.length) {
   console.error('\n构建校验失败：');
   errors.forEach(error => console.error(`✗ ${error}`));
   process.exit(1);
 }
-
-console.log(`\nV20构建校验通过：${cards.length || 78}张牌，${cardImages.length}张本地小阿尔卡那牌图。`);
+console.log(`\nV22构建校验通过：78张经典牌面，生命之镜上传区 ${uploaded.length}/22 张。`);

@@ -42,5 +42,5 @@
     if (ids.size !== (cards || []).length) errors.push('card ids must be unique');
     return { valid: errors.length === 0, errors };
   }
-  window.LifeMirrorTarotCore = Object.freeze({ version: '21.0.0', randomInt, shuffle, randomOrientation, chooseUniqueNumbers, drawByNumbers, validateDeck });
+  window.LifeMirrorTarotCore = Object.freeze({ version: '22.0.0', randomInt, shuffle, randomOrientation, chooseUniqueNumbers, drawByNumbers, validateDeck });
 })();

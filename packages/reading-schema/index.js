@@ -1,6 +1,6 @@
-/* V21 阅读记录协议。不同平台共享同一种数据格式。 */
+/* V22 阅读记录协议。新增牌组与实际回退牌面字段。 */
 (() => {
-  const VERSION = 3;
+  const VERSION = 4;
   const normalizeLearningNote = (note = {}) => ({
     cardId: Number(note.cardId),
     keywords: String(note.keywords || '').slice(0, 180),
