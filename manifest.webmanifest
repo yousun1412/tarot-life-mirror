@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "生命之镜塔罗 V19",
+  "name": "生命之镜塔罗 V20",
   "short_name": "生命之镜",
-  "description": "可安装、可离线的完整78张塔罗应用，支持智能牌阵推荐、问事抽牌和日周月运势。",
+  "description": "完整78张塔罗应用，支持智能牌阵、日周月运势、学习塔罗与跨平台数据结构。",
   "lang": "zh-CN",
   "start_url": "./index.html",
   "scope": "./",
@@ -99,6 +99,17 @@
       "name": "浏览完整78张塔罗牌库",
       "short_name": "完整牌库",
       "url": "./index.html?action=library",
+      "icons": [
+        {
+          "src": "./icons/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "学习塔罗",
+      "short_name": "学习塔罗",
+      "url": "./index.html?action=learn",
       "icons": [
         {
           "src": "./icons/icon-192.png",

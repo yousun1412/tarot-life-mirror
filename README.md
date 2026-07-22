@@ -1,16 +1,25 @@
-# 生命之镜塔罗 V19
+# 生命之镜塔罗 V20
 
-完整78张、可安装、可离线的本地塔罗自我反思应用。
+V20 在 V19 全部抽牌与运势功能之上，加入跨平台核心架构和学习塔罗基础版。
 
-## V19 新功能
+## 新增
 
-- 输入问题后，根据主题与关键词推荐合适牌阵。
-- 单牌、三牌、阻力与资源四张、关系模式五张、两个选择六张、凯尔特十字十张。
-- 选择牌阵可填写选择A与选择B的名称。
-- 全部牌阵支持自选1–78编号或“交给命运”。
-- 四至十张牌分享卡和本地历史记录。
-- 保留本日、本周、本月运势、三层解读、牌库和离线使用。
+- `packages/tarot-core`：纯洗牌、随机、抽牌与牌库校验逻辑
+- `packages/platform-core`：Web / Capacitor / Tauri / 微信小程序能力适配入口
+- `packages/reading-schema`：跨平台阅读记录与个人牌义协议
+- 每日学习牌
+- 看图识牌测验
+- 我的牌义
+- 本地学习进度
+
+## 本地运行
+
+```bash
+python -m http.server 8080
+```
+
+打开 `http://localhost:8080`。
 
 ## 发布
 
-推送到 `main` 后，GitHub Actions 会运行 `node scripts/validate-build.mjs`，校验通过后自动发布 GitHub Pages。
+将全部文件上传到仓库根目录。GitHub Actions 会运行 `node scripts/validate-build.mjs`，通过后自动发布。

@@ -1,6 +1,7 @@
 (() => {
   const KEY = 'lifeMirrorTarotHistory';
   const MAX_RECORDS = 100;
+  const platformStorage = () => window.LifeMirrorPlatform?.storage;
 
   const uid = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`;
   const resolveCard = raw => {
@@ -11,6 +12,8 @@
   function normalizeRecord(record = {}) {
     const timestamp = record.timestamp || (record.date ? Date.parse(record.date) : Date.now()) || Date.now();
     return {
+      schemaVersion: window.LifeMirrorReadingSchema?.version || 2,
+      platform: record.platform || window.LifeMirrorPlatform?.runtime || 'web',
       id: record.id || uid(),
       timestamp,
       date: record.date || new Date(timestamp).toLocaleString(),
@@ -76,7 +79,7 @@
 
   function load() {
     try {
-      const parsed = JSON.parse(localStorage.getItem(KEY) || '[]');
+      const parsed = JSON.parse(platformStorage()?.getSync(KEY) || '[]');
       if (!Array.isArray(parsed)) return [];
       return parsed.map(normalizeRecord).sort((a, b) => b.timestamp - a.timestamp);
     } catch (error) {
@@ -87,7 +90,7 @@
 
   function write(records) {
     try {
-      localStorage.setItem(KEY, JSON.stringify(records.slice(0, MAX_RECORDS)));
+      platformStorage()?.setSync(KEY, JSON.stringify(records.slice(0, MAX_RECORDS)));
     } catch (error) {
       console.warn('History write failed:', error);
     }
@@ -104,7 +107,7 @@
   }
 
   function remove(id) { write(load().filter(item => item.id !== id)); }
-  function clear() { try { localStorage.removeItem(KEY); } catch (error) { console.warn('History clear failed:', error); } window.dispatchEvent(new CustomEvent('life-mirror-history-change')); }
+  function clear() { try { platformStorage()?.removeSync(KEY); } catch (error) { console.warn('History clear failed:', error); } window.dispatchEvent(new CustomEvent('life-mirror-history-change')); }
   function update(id, patch) {
     const records = load();
     const index = records.findIndex(item => item.id === id);
@@ -119,7 +122,7 @@
   }
 
   function exportData() {
-    const blob = new Blob([JSON.stringify({ version: 19, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify({ version: 20, schemaVersion: 2, exportedAt: new Date().toISOString(), records: load() }, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;

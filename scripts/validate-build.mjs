@@ -12,8 +12,8 @@ const read = relative => fs.readFileSync(path.join(root, relative), 'utf8');
 
 const required = [
   'index.html', 'offline.html', 'manifest.webmanifest', 'version.json', 'service-worker.js',
-  'css/main.css', 'css/v14.css', 'css/v15.css', 'css/v16.css', 'css/v17.css', 'css/v18.css', 'css/v19.css', 'data/major-arcana.js', 'data/minor-arcana.js', 'data/interpretation-v19.js',
-  'js/app.js', 'js/pwa.js', 'js/storage.js', 'js/card-viewer.js', 'js/library.js',
+  'css/main.css', 'css/v14.css', 'css/v15.css', 'css/v16.css', 'css/v17.css', 'css/v18.css', 'css/v19.css', 'css/v20.css', 'packages/platform-core/index.js', 'packages/tarot-core/index.js', 'packages/reading-schema/index.js', 'data/major-arcana.js', 'data/minor-arcana.js', 'data/interpretation-v19.js',
+  'js/app.js', 'js/pwa.js', 'js/storage.js', 'js/card-viewer.js', 'js/library.js', 'js/learning.js',
   'js/share.js', 'js/history.js', 'icons/icon-192.png', 'icons/icon-512.png',
   'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png'
 ];
@@ -80,7 +80,7 @@ for (const ref of shellRefs) {
   if (ref === './') continue;
   if (!exists(ref)) fail(`Service Worker核心文件不存在：${ref}`);
 }
-if (shellRefs.some(ref => ref.includes('assets/cards'))) fail('V19不应在安装阶段预缓存全部牌图');
+if (shellRefs.some(ref => ref.includes('assets/cards'))) fail('V20不应在安装阶段预缓存全部牌图');
 ok('Service Worker核心缓存清单检查完成');
 
 try {
@@ -143,12 +143,36 @@ for (const marker of ['beginDailyFortune','beginWeeklyFortune','beginMonthlyFort
   if (!appText.includes(marker)) fail(`V19流程缺少标记：${marker}`);
 }
 if (!appText.includes("getPositions().length")) fail('V19抽牌数量未改为动态牌阵长度');
-for (const marker of ['data-interpretation-layer="overview"','data-interpretation-layer="full"','data-interpretation-layer="deep"','本月运势','V19']) { if (!html.includes(marker)) fail(`V19页面缺少标记：${marker}`); }
+for (const marker of ['data-interpretation-layer="overview"','data-interpretation-layer="full"','data-interpretation-layer="deep"','本月运势','V20']) { if (!html.includes(marker)) fail(`V20页面缺少标记：${marker}`); }
 
 
 for (const marker of ['spread.four-mode','spread.six-mode','spread.ten-mode.celtic-mode']) { if (!read('css/v19.css').includes(marker)) fail(`V19布局缺少标记：${marker}`); }
 for (const spread of ['obstacle-four','relationship-five','choice-six','celtic-ten']) { if (!appText.includes(spread)) fail(`V19缺少牌阵：${spread}`); }
 if (!read('js/share.js').includes('cards.length === 10')) fail('V19分享卡未适配十张牌');
+
+
+// V20 cross-platform and learning checks
+for (const relativePath of ['css/v20.css','js/learning.js','packages/platform-core/index.js','packages/tarot-core/index.js','packages/reading-schema/index.js']) {
+  if (!exists(relativePath)) fail(`缺少 V20 文件：${relativePath}`);
+}
+for (const marker of ['learningDialog','learningTabs','learningContent','V20']) if (!html.includes(marker)) fail(`V20页面缺少标记：${marker}`);
+for (const marker of ['每日学习','看图识牌','我的牌义','学习进度','lifeMirrorLearningV20']) if (!read('js/learning.js').includes(marker)) fail(`V20学习模块缺少标记：${marker}`);
+for (const marker of ['LifeMirrorPlatform','register','storage','capacitor','tauri','wechat']) if (!read('packages/platform-core/index.js').toLowerCase().includes(marker.toLowerCase())) fail(`平台核心缺少标记：${marker}`);
+try {
+  const context = vm.createContext({ window: {}, globalThis: {}, navigator: {}, localStorage: { getItem(){return null}, setItem(){}, removeItem(){} }, console, Uint32Array, Math });
+  context.globalThis = context;
+  vm.runInContext(read('packages/tarot-core/index.js'), context, { filename: 'tarot-core/index.js' });
+  const core = context.window.LifeMirrorTarotCore;
+  const sample = Array.from({length:78}, (_,id)=>({id}));
+  if (!core.validateDeck(sample).valid) fail('V20塔罗核心未通过78张牌校验');
+  const nums = core.chooseUniqueNumbers(78,10);
+  if (nums.length !== 10 || new Set(nums).size !== 10) fail('V20随机抽牌未生成10个不重复数字');
+  const drawn = core.drawByNumbers(sample, [1,20,78], ['upright','reversed','upright']);
+  if (drawn.map(item=>item.card.id).join(',') !== '0,19,77') fail('V20按编号抽牌结果异常');
+  ok('V20纯塔罗核心检查通过');
+} catch (error) { fail(`V20塔罗核心执行失败：${error.stack || error.message}`); }
+const storageText = read('js/storage.js');
+if (!storageText.includes('LifeMirrorPlatform') || !storageText.includes('schemaVersion')) fail('V20历史记录尚未接入跨平台存储与协议');
 
 if (errors.length) {
   console.error('\n构建校验失败：');
@@ -156,4 +180,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`\nV19构建校验通过：${cards.length || 78}张牌，${cardImages.length}张本地小阿尔卡那牌图。`);
+console.log(`\nV20构建校验通过：${cards.length || 78}张牌，${cardImages.length}张本地小阿尔卡那牌图。`);

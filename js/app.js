@@ -521,29 +521,11 @@ function shuffleOnce() {
   }
 }
 
-function randomInt(max) {
-  if (!Number.isInteger(max) || max <= 0) return 0;
-  if (globalThis.crypto?.getRandomValues) {
-    const limit = Math.floor(0x100000000 / max) * max;
-    const values = new Uint32Array(1);
-    do globalThis.crypto.getRandomValues(values); while (values[0] >= limit);
-    return values[0] % max;
-  }
-  return Math.floor(Math.random() * max);
-}
+function randomInt(max) { return window.LifeMirrorTarotCore?.randomInt(max) ?? Math.floor(Math.random() * max); }
 
-function randomOrientation() {
-  return randomInt(2) === 0 ? 'upright' : 'reversed';
-}
+function randomOrientation() { return window.LifeMirrorTarotCore?.randomOrientation() || (randomInt(2) === 0 ? 'upright' : 'reversed'); }
 
-function shuffledCopy(cards) {
-  const result = [...cards];
-  for (let index = result.length - 1; index > 0; index--) {
-    const swapIndex = randomInt(index + 1);
-    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
-  }
-  return result;
-}
+function shuffledCopy(cards) { return window.LifeMirrorTarotCore?.shuffle(cards) || [...cards]; }
 
 function finishShuffle() {
   if (state.shuffled) return;
@@ -1812,7 +1794,7 @@ function start() {
       { home: true, icon: '◐', label: weekly ? '查看本周运势' : '本周运势', description: '主线、挑战与可用力量', onClick: beginWeeklyFortune },
       { home: true, icon: '☾', label: monthly ? '查看本月运势' : '本月运势', description: '五张或七张月度地图', onClick: beginMonthlyFortune },
       { home: true, icon: '✦', label: '问一件事', description: '围绕具体问题抽牌', onClick: chooseTopic },
-      { home: true, icon: '▦', label: '学习塔罗', description: '浏览78张牌与象征', onClick: () => window.LifeMirrorLibrary?.open() },
+      { home: true, icon: '▦', label: '学习塔罗', description: '每日学习、识牌与个人牌义', onClick: () => window.LifeMirrorLearning?.open() },
       { home: true, icon: '☷', label: '我的记录', description: recordCount ? `${recordCount} 条本地记录` : '回看、收藏与导出', onClick: () => window.LifeMirrorHistory?.open() }
     ]
   );
@@ -1885,6 +1867,7 @@ $('closePrivacy').onclick = () => $('privacyDialog').close();
 window.LifeMirrorApp = { showToast, getCurrentReadingSnapshot, showFullInterpretation, reset };
 window.LifeMirrorViewer?.init();
 window.LifeMirrorLibrary?.init();
+window.LifeMirrorLearning?.init();
 window.LifeMirrorShare?.init();
 window.LifeMirrorHistory?.init();
 
@@ -1893,6 +1876,7 @@ start();
 if (requestedAction === 'start') setTimeout(chooseTopic, 200);
 if (requestedAction === 'history') setTimeout(() => window.LifeMirrorHistory?.open(), 200);
 if (requestedAction === 'library') setTimeout(() => window.LifeMirrorLibrary?.open(), 200);
+if (requestedAction === 'learn') setTimeout(() => window.LifeMirrorLearning?.open(), 200);
 if (requestedAction === 'daily') setTimeout(beginDailyFortune, 200);
 if (requestedAction === 'weekly') setTimeout(beginWeeklyFortune, 200);
 if (requestedAction === 'monthly') setTimeout(beginMonthlyFortune, 200);
