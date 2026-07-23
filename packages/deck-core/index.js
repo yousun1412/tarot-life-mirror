@@ -1,4 +1,4 @@
-/* V22 跨平台牌组核心：注册、检测、回退、选择与历史牌面解析。 */
+/* V22.1 跨平台牌组核心：注册、检测、回退、默认牌组与单次抽牌牌组。 */
 (() => {
   const STORAGE_KEY = 'lifeMirrorTarotDeckV22';
   const registry = window.LIFE_MIRROR_DECKS || {};
@@ -9,7 +9,8 @@
   const assetPath = src => window.LIFE_MIRROR_ASSET_MAP?.[src] || src;
 
   const normalizeId = id => registry[id] ? id : 'classic-rws';
-  let currentId = normalizeId(storage()?.getSync?.(STORAGE_KEY) || 'classic-rws');
+  let defaultId = normalizeId(storage()?.getSync?.(STORAGE_KEY) || 'classic-rws');
+  let currentId = defaultId;
 
   function cardKey(card) {
     if (card?.arcana === 'major') return `major:${String(Number(card.id)).padStart(2, '0')}`;
@@ -133,18 +134,47 @@
   }
 
   function getCurrentDeckInfo() {
-    return { id: currentId, deck: registry[currentId], status: getDeckStatus(currentId) };
+    return {
+      id: currentId,
+      defaultId,
+      isSessionOverride: currentId !== defaultId,
+      deck: registry[currentId],
+      defaultDeck: registry[defaultId],
+      status: getDeckStatus(currentId)
+    };
   }
 
-  async function setCurrentDeck(deckId) {
+  function applyCurrentDeck(id, { persist = false } = {}) {
+    currentId = normalizeId(id);
+    if (persist) {
+      defaultId = currentId;
+      storage()?.setSync?.(STORAGE_KEY, defaultId);
+    }
+    document.documentElement.dataset.tarotDeck = currentId;
+    document.documentElement.dataset.tarotDefaultDeck = defaultId;
+    window.dispatchEvent(new CustomEvent('life-mirror-deck-change', { detail: getCurrentDeckInfo() }));
+    return getCurrentDeckInfo();
+  }
+
+  async function prepareDeck(deckId) {
     const id = normalizeId(deckId);
     if (registry[id]?.status === 'planned') throw new Error('这套牌面仍在规划中');
     if (!registry[id]?.builtIn) await probeDeck(id, { force: true });
-    currentId = id;
-    storage()?.setSync?.(STORAGE_KEY, id);
-    document.documentElement.dataset.tarotDeck = id;
-    window.dispatchEvent(new CustomEvent('life-mirror-deck-change', { detail: getCurrentDeckInfo() }));
-    return getCurrentDeckInfo();
+    return id;
+  }
+
+  async function setCurrentDeck(deckId) {
+    const id = await prepareDeck(deckId);
+    return applyCurrentDeck(id, { persist: true });
+  }
+
+  async function setSessionDeck(deckId) {
+    const id = await prepareDeck(deckId);
+    return applyCurrentDeck(id, { persist: false });
+  }
+
+  function restoreDefaultDeck() {
+    return applyCurrentDeck(defaultId, { persist: false });
   }
 
   function resolveCard(card, requestedDeckId = currentId, preferredResolvedDeckId = '') {
@@ -198,14 +228,16 @@
   }
 
   document.documentElement.dataset.tarotDeck = currentId;
+  document.documentElement.dataset.tarotDefaultDeck = defaultId;
   decorateCards();
   if (currentId !== 'classic-rws') setTimeout(() => probeDeck(currentId), 0);
 
   window.LifeMirrorDecks = Object.freeze({
     registry,
     get currentId() { return currentId; },
+    get defaultId() { return defaultId; },
     cardKey, pathFor, getCardImage, getResolvedDeckId, getCandidates,
-    getDeckStatus, getCurrentDeckInfo, probeDeck, setCurrentDeck,
+    getDeckStatus, getCurrentDeckInfo, probeDeck, setCurrentDeck, setSessionDeck, restoreDefaultDeck,
     resolveCard, resolveRawCard, loadCardImage, decorateCards
   });
 })();

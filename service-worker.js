@@ -1,4 +1,4 @@
-const VERSION = '22.0.0';
+const VERSION = '22.1.0';
 const CORE_CACHE = `life-mirror-core-v${VERSION}`;
 const RUNTIME_CACHE = `life-mirror-runtime-v${VERSION}`;
 const CACHE_PREFIX = 'life-mirror-';

@@ -97,7 +97,7 @@ try {
   const version = JSON.parse(read('version.json')).version;
   const swVersion = sw.match(/const VERSION = ['"]([^'"]+)/)?.[1];
   const pwaVersion = read('js/pwa.js').match(/const APP_VERSION = ['"]([^'"]+)/)?.[1];
-  if (version !== '22.0.0' || version !== swVersion || version !== pwaVersion) fail(`版本不一致：${version}/${swVersion}/${pwaVersion}`);
+  if (version !== '22.1.0' || version !== swVersion || version !== pwaVersion) fail(`版本不一致：${version}/${swVersion}/${pwaVersion}`);
   else ok(`版本号一致：${version}`);
 } catch (error) { fail(`版本检查失败：${error.message}`); }
 
